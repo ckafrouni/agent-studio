@@ -1,30 +1,12 @@
 import { Context, Hono } from "hono";
 import { stream } from "hono/streaming";
-import { env } from "@/env";
-import { AzureChatOpenAI } from "@langchain/openai";
 import {
   AIMessageChunk,
   BaseMessage,
   HumanMessage,
 } from "@langchain/core/messages";
 import { IterableReadableStreamInterface } from "@langchain/core/utils/stream";
-import {
-  graphWorkflow,
-  GraphAnnotation,
-  GraphAnnotationType,
-} from "@/graphs/rag";
-import { StreamEvent } from "@langchain/core/tracers/log_stream";
-import { CompiledStateGraph, StateGraph } from "@langchain/langgraph";
-
-// MARK: - LLM Config
-const model = new AzureChatOpenAI({
-  azureOpenAIApiVersion: env.AZURE_OPENAI_API_VERSION,
-  azureOpenAIApiKey: env.AZURE_OPENAI_API_KEY,
-  azureOpenAIApiInstanceName: env.AZURE_OPENAI_API_INSTANCE_NAME,
-  azureOpenAIApiDeploymentName: env.AZURE_OPENAI_API_DEPLOYMENT_NAME,
-  model: env.AZURE_OPENAI_CHAT_MODEL,
-  streaming: true,
-});
+import vectorRagWorkflow from "~/lib/workflows/vector-rag";
 
 // MARK: - Helpers
 const streamMessages = async (
@@ -35,7 +17,7 @@ const streamMessages = async (
     return stream(c, async (stream) => {
       const langchainStream: IterableReadableStreamInterface<
         [AIMessageChunk, unknown]
-      > = await graphWorkflow.stream(inputs, {
+      > = await vectorRagWorkflow.stream(inputs, {
         streamMode: "messages",
       });
 
@@ -80,14 +62,14 @@ const streamUpdates = async (
 // MARK: - Router
 const router = new Hono();
 
-router.post("/rag", async (c) => {
+router.post("/vector-rag", async (c) => {
   const { prompt } = await c.req.json();
 
   if (!prompt) {
     return c.json({ error: "Missing prompt" }, 400);
   }
 
-  return streamUpdates(graphWorkflow, c, {
+  return streamUpdates(vectorRagWorkflow, c, {
     messages: [
       new HumanMessage({
         content: prompt,

@@ -1,10 +1,10 @@
-import { env } from "@/env";
+import { env } from "~/env";
 import { ChatOpenAI } from "@langchain/openai";
 import { StateGraph, START, END, Annotation } from "@langchain/langgraph";
 import { BaseMessage, HumanMessage } from "@langchain/core/messages";
-import { collection } from "@/lib/chroma";
 import { PromptTemplate } from "@langchain/core/prompts";
 import { DocumentInterface } from "@langchain/core/documents";
+import { collection } from "~/lib/vector-database/chroma";
 
 interface Document extends DocumentInterface {
   metadata: {
@@ -28,7 +28,7 @@ export type GraphAnnotationType = typeof GraphAnnotation.State;
 // MARK: - LLM Config
 const model = new ChatOpenAI({
   apiKey: env.OPENAI_API_KEY,
-  model: "gpt-4o-mini",
+  model: env.OPENAI_CHAT_MODEL,
   streaming: true,
 });
 
@@ -49,7 +49,7 @@ const retrieveDocuments = async (state: GraphAnnotationType) => {
         distance: results.distances?.[0][i] ?? 1,
       },
     }))
-    .filter((doc) => doc.metadata.distance < 0.5);
+    .filter((doc) => doc.metadata.distance < 0.7);
 
   return { documents };
 };
@@ -111,7 +111,7 @@ const fallbackResponse = async (state: GraphAnnotationType) => {
 
 // MARK: - Graph
 
-export const graphWorkflow = new StateGraph(GraphAnnotation)
+export default new StateGraph(GraphAnnotation)
   .addNode("retriever", retrieveDocuments)
   .addNode("checker", checkRetrievalQuality)
   .addNode("generator", generateResponse)
