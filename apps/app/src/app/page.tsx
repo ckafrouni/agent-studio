@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { useChatStream } from "@/hooks/useChatStream";
+import { Document } from "@/types/chat"; // Import the client-side Document type
 import {
   Accordion,
   AccordionContent,
@@ -9,6 +10,78 @@ import {
 } from "@/components/ui/accordion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Badge } from "@/components/ui/badge";
+
+// Component to render AI response with citations
+const AICitationResponse = ({
+  content,
+  documents,
+}: {
+  content: string;
+  documents?: Document[];
+}) => {
+  console.log("AICitationResponse rendered. Documents:", documents); // Log received documents
+
+  if (!documents || documents.length === 0) {
+    return <div>{content}</div>;
+  }
+
+  // Matches [doc: suivi par des lettres/chiffres/underscores] suivi par (#quelque chose)
+  const citationRegex = /\[doc:(\w+)\]\(.*?\)/g;
+  const parts = content.split(citationRegex);
+
+  return (
+    <div>
+      {parts.map((part, index) => {
+        // Even indices are text, odd indices are doc IDs
+        if (index % 2 === 0) {
+          return <span key={index}>{part}</span>;
+        } else {
+          console.log(`Processing citation part: ${part}`); // Log the raw part matched
+          const docId = part;
+          console.log(`Looking for document with ID: '${docId}'`); // Log the extracted docId
+          const document = documents.find((doc) => doc.metadata.id === docId);
+          console.log("Found document:", document); // Log the result of the find operation
+
+          return (
+            <Popover key={index}>
+              <PopoverTrigger asChild>
+                <Badge
+                  variant="outline"
+                  className="cursor-pointer mx-1 hover:bg-accent hover:text-accent-foreground"
+                >
+                  [doc:{docId}]
+                </Badge>
+              </PopoverTrigger>
+              <PopoverContent className="w-80 text-sm">
+                {document ? (
+                  <div className="space-y-2">
+                    <h4 className="font-medium leading-none">
+                      Source Document
+                    </h4>
+                    <p className="text-muted-foreground">
+                      ID: {document.metadata.id}
+                    </p>
+                    <p className="max-h-40 overflow-y-auto">
+                      {document.pageContent}
+                    </p>
+                  </div>
+                ) : (
+                  "Document not found"
+                )}
+              </PopoverContent>
+            </Popover>
+          );
+        }
+      })}
+    </div>
+  );
+};
 
 export default function Home() {
   const { turns, sendMessage } = useChatStream();
@@ -37,26 +110,35 @@ export default function Home() {
 
             {turn.steps.length > 0 && (
               <Accordion type="multiple" className="text-muted-foreground">
-                {turn.steps.map((step, stepIndex) => (
-                  <AccordionItem
-                    key={stepIndex}
-                    value={`turn-${index}-step-${stepIndex}`}
-                    className=""
-                  >
-                    <AccordionTrigger className="text-xs">
-                      Step {stepIndex + 1} - {step.name}
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      <pre className="text-xs overflow-x-auto">
-                        {JSON.stringify(step.data, null, 2)}
-                      </pre>
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
+                {turn.steps.map((step, stepIndex) => {
+                  const stepName = Object.values(step)[0] as string;
+                  const stepData = Object.values(step)[1] as string;
+                  return (
+                    <AccordionItem
+                      key={stepIndex}
+                      value={`turn-${index}-step-${stepIndex}`}
+                      className=""
+                    >
+                      <AccordionTrigger className="text-xs">
+                        Step {stepIndex + 1} - {stepName}
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <pre className="text-xs overflow-x-auto">
+                          {JSON.stringify(stepData, null, 2)}
+                        </pre>
+                      </AccordionContent>
+                    </AccordionItem>
+                  );
+                })}
               </Accordion>
             )}
 
-            {turn.ai && <div>{turn.ai.content as string}</div>}
+            {turn.ai && (
+              <AICitationResponse
+                content={turn.ai.content as string}
+                documents={turn.sourceDocuments}
+              />
+            )}
           </div>
         ))}
       </div>

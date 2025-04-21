@@ -16,7 +16,9 @@ export interface Document extends DocumentInterface {
 export type Routes = "generator" | "fallback";
 
 const formatDocumentsAsString = (docs: Document[]): string => {
-  return docs.map((doc) => doc.pageContent).join("\n\n");
+  return docs
+    .map((doc) => `[doc:${doc.metadata.id}] ${doc.pageContent}`)
+    .join("\n\n");
 };
 
 export const GraphAnnotation = Annotation.Root({
@@ -72,14 +74,15 @@ const generator = async (state: GraphAnnotationType) => {
 
   const prompt = await PromptTemplate.fromTemplate(
     `
-    You are a helpful assistant that answers questions based on the provided context.
-    If you don't know the answer based on the context, just say that you don't know.
-    
+    You are a helpful assistant that answers questions based ONLY on the provided context.
     Context:
     {context}
-    
+    Based ONLY on the context above, answer the question. You MUST cite the 'id' from the document metadata using the markdown link format [doc:ID](#ID) at the end of the relevant sentence whenever you use information from a document. Do not make up information.
+
     Question:
     {question}
+
+    Answer:
     `
   ).format({ context, question });
 
@@ -87,6 +90,13 @@ const generator = async (state: GraphAnnotationType) => {
     ...state.messages,
     new SystemMessage(prompt),
   ]);
+
+  // Append the retrieved documents to the final message's metadata
+  // This isn't strictly necessary for citation but useful for potential client-side linking
+  response.response_metadata = {
+    ...(response.response_metadata || {}),
+    source_documents: state.documents,
+  };
 
   return { messages: response };
 };
@@ -100,9 +110,9 @@ const fallback_generator = async (state: GraphAnnotationType) => {
     `
     You are a helpful assistant that answers questions based on the provided context.
     The RAG system failed to retrieve relevant context for the question.
-  
+
     Start by saying "I don't have enough context to answer this question", then briefly explain what you know.
-    
+
     Question:
     {question}
     `

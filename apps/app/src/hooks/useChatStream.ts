@@ -1,6 +1,10 @@
 import { useState, useCallback } from "react";
-import { HumanMessage, AIMessage } from "@langchain/core/messages";
-import type { Turn, GraphUpdate } from "@/types/chat";
+import {
+  HumanMessage,
+  AIMessage,
+  AIMessageChunk,
+} from "@langchain/core/messages";
+import type { Turn, GraphUpdate, Document } from "@/types/chat";
 import { isAIMessageChunk } from "@/lib/utils";
 
 const API_URL = "http://localhost:3000/workflows/vector-rag/messages";
@@ -12,7 +16,12 @@ export function useChatStream() {
     // Add user message immediately
     setTurns((prevTurns) => [
       ...prevTurns,
-      { user: new HumanMessage(prompt), steps: [], ai: null },
+      {
+        user: new HumanMessage(prompt),
+        steps: [],
+        ai: null,
+        sourceDocuments: [],
+      },
     ]);
 
     try {
@@ -29,7 +38,9 @@ export function useChatStream() {
         console.error("SSE request failed:", response.statusText);
         // Optionally update the last turn with an error message
         setTurns((prevTurns) => {
-          const lastTurn = prevTurns[prevTurns.length - 1];
+          const lastTurnIndex = prevTurns.length - 1;
+          if (lastTurnIndex < 0) return prevTurns;
+          const lastTurn = prevTurns[lastTurnIndex];
           return [
             ...prevTurns.slice(0, -1),
             {
@@ -81,9 +92,9 @@ export function useChatStream() {
                 const stepName = nodeKeys[0];
                 const stepData = (update as Record<string, unknown>)[stepName];
                 setTurns((prevTurns) => {
-                  const lastTurn = prevTurns[prevTurns.length - 1];
-                  // Ensure lastTurn exists before trying to update it
-                  if (!lastTurn) return prevTurns;
+                  const lastTurnIndex = prevTurns.length - 1;
+                  if (lastTurnIndex < 0) return prevTurns;
+                  const lastTurn = prevTurns[lastTurnIndex];
                   return [
                     ...prevTurns.slice(0, -1),
                     {
@@ -128,20 +139,45 @@ export function useChatStream() {
 
                 if (chunkContent) {
                   setTurns((prevTurns) => {
-                    const lastTurn = prevTurns[prevTurns.length - 1];
-                    if (!lastTurn) return prevTurns; // Safety check
+                    const lastTurnIndex = prevTurns.length - 1;
+                    if (lastTurnIndex < 0) return prevTurns;
+                    const currentTurn = prevTurns[lastTurnIndex];
 
-                    const existingAiContent = lastTurn.ai
-                      ? lastTurn.ai.content
-                      : "";
-                    const newAiMessage = new AIMessage({
-                      content: (existingAiContent as string) + chunkContent,
-                    });
+                    const currentAIContent =
+                      (currentTurn.ai?.content as string) || "";
+                    const updatedAIContent = currentAIContent + chunkContent;
 
-                    return [
-                      ...prevTurns.slice(0, -1),
-                      { ...lastTurn, ai: newAiMessage },
-                    ];
+                    // Check for source documents in metadata
+                    let sourceDocuments = currentTurn.sourceDocuments;
+                    const metadataChunk = messageChunk as AIMessageChunk;
+                    if (
+                      metadataChunk.response_metadata &&
+                      "source_documents" in metadataChunk.response_metadata &&
+                      Array.isArray(
+                        metadataChunk.response_metadata.source_documents
+                      )
+                    ) {
+                      sourceDocuments = metadataChunk.response_metadata
+                        .source_documents as Document[];
+                    }
+
+                    const updatedTurn = {
+                      ...currentTurn,
+                      ai: new AIMessage({
+                        content: updatedAIContent,
+                        // Preserve existing metadata if any, merge with new
+                        response_metadata: {
+                          ...(currentTurn.ai?.response_metadata || {}),
+                          ...(metadataChunk.response_metadata || {}),
+                        },
+                      }),
+                      sourceDocuments, // Update sourceDocuments
+                    };
+
+                    // Return the full updated turns array
+                    const updatedTurns = [...prevTurns];
+                    updatedTurns[lastTurnIndex] = updatedTurn;
+                    return updatedTurns;
                   });
                 }
               } else {
@@ -162,7 +198,9 @@ export function useChatStream() {
       console.error("Error fetching chat stream:", error);
       // Optionally update UI to show a general error
       setTurns((prevTurns) => {
-        const lastTurn = prevTurns[prevTurns.length - 1];
+        const lastTurnIndex = prevTurns.length - 1;
+        if (lastTurnIndex < 0) return prevTurns;
+        const lastTurn = prevTurns[lastTurnIndex];
         return [
           ...prevTurns.slice(0, -1),
           {

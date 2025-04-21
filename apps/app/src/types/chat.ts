@@ -32,19 +32,27 @@ export interface GeneratorOutput {
 }
 
 // Represents a generic update from the LangGraph stream
-export interface GraphUpdate {
-  generator?: GeneratorOutput;
-  retriever?: RetrieverOutput;
-  checker?: CheckerOutput;
-  // Add other potential node keys here, refining their types as needed
+// Represents a single update from a graph node
+// It should ideally have exactly one key, which is the node name.
+export type GraphUpdate = 
+  | { retriever: RetrieverOutput }
+  | { checker: CheckerOutput }
+  | { generator: GeneratorOutput }
+  // Using a record for flexibility, assuming one key per update object.
+  | Record<string, RetrieverOutput | CheckerOutput | GeneratorOutput | unknown>;
+
+export interface Document {
+  pageContent: string;
+  metadata: {
+    id: string;
+    distance?: number;
+  };
 }
 
 // Represents a single user-AI interaction turn
 export interface Turn {
   user: HumanMessage;
-  steps: Array<{
-    name: string;
-    data: RetrieverOutput | CheckerOutput | GeneratorOutput | unknown;
-  }>;
+  steps: GraphUpdate[];
   ai: AIMessage | null;
+  sourceDocuments?: Document[];
 }
