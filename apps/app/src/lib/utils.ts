@@ -1,5 +1,11 @@
 import { AIMessageChunk } from "@langchain/core/messages";
 import type { ParsedAIMessageChunk } from "@/types/chat";
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
 
 /**
  * Type guard to check if the received data resembles an AIMessageChunk
