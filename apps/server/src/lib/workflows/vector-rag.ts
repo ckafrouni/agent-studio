@@ -1,11 +1,7 @@
 import { env } from "~/env";
 import { ChatOpenAI } from "@langchain/openai";
 import { StateGraph, START, END, Annotation } from "@langchain/langgraph";
-import {
-  BaseMessage,
-  HumanMessage,
-  SystemMessage,
-} from "@langchain/core/messages";
+import { BaseMessage, SystemMessage } from "@langchain/core/messages";
 import { PromptTemplate } from "@langchain/core/prompts";
 import { DocumentInterface } from "@langchain/core/documents";
 import { collection } from "~/lib/vector-database/chroma";
@@ -89,7 +85,7 @@ const generator = async (state: GraphAnnotationType) => {
 
   const response = await model.invoke([
     ...state.messages,
-    new HumanMessage(prompt),
+    new SystemMessage(prompt),
   ]);
 
   return { messages: response };
@@ -114,7 +110,7 @@ const fallback_generator = async (state: GraphAnnotationType) => {
 
   const response = await model.invoke([
     ...state.messages,
-    new HumanMessage(prompt),
+    new SystemMessage(prompt),
   ]);
 
   return { messages: response };
