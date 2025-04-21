@@ -55,7 +55,7 @@ const doc_retriever = async (state: GraphAnnotationType) => {
         distance: results.distances?.[0][i] ?? 1,
       },
     }))
-    .filter((doc) => doc.metadata.distance < 0.7);
+    .filter((doc) => doc.metadata.distance < 0.8);
 
   return { documents };
 };
@@ -105,7 +105,7 @@ const fallback_generator = async (state: GraphAnnotationType) => {
     You are a helpful assistant that answers questions based on the provided context.
     The RAG system failed to retrieve relevant context for the question.
   
-    Do not make up an answer, just say that you don't know.
+    Start by saying "I don't have enough context to answer this question", then briefly explain what you know.
     
     Question:
     {question}
