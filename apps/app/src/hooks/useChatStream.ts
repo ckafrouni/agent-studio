@@ -7,7 +7,7 @@ import {
 import type { Turn, GraphUpdate, Document } from "@/types/chat";
 import { isAIMessageChunk } from "@/lib/utils";
 
-const API_URL = "http://localhost:3000/workflows/vector-rag/messages";
+const API_URL = "http://localhost:3030/workflows/vector-rag/messages";
 
 export function useChatStream() {
   const [turns, setTurns] = useState<Turn[]>([]);

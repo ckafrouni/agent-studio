@@ -2,7 +2,7 @@
   "name": "server",
   "type": "module",
   "scripts": {
-    "dev": "bun run --hot src/index.ts"
+    "dev": "PORT=3030 bun run --hot src/index.ts"
   },
   "dependencies": {
     "@langchain/anthropic": "^0.3.17",
