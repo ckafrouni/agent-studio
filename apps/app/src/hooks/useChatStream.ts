@@ -6,8 +6,7 @@ import {
 } from "@langchain/core/messages";
 import type { Turn, GraphUpdate, Document } from "@/types/chat";
 import { isAIMessageChunk } from "@/lib/utils";
-
-const API_URL = "http://localhost:3030/workflows/vector-rag/messages";
+import { env } from "@/env";
 
 export function useChatStream() {
   const [turns, setTurns] = useState<Turn[]>([]);
@@ -25,14 +24,17 @@ export function useChatStream() {
     ]);
 
     try {
-      const response = await fetch(API_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/x-ndjson",
-        },
-        body: JSON.stringify({ prompt }),
-      });
+      const response = await fetch(
+        `${env.NEXT_PUBLIC_SERVER_URL}/api/workflows/vector-rag/messages`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/x-ndjson",
+          },
+          body: JSON.stringify({ prompt }),
+        }
+      );
 
       if (!response.ok || !response.body) {
         console.error("SSE request failed:", response.statusText);

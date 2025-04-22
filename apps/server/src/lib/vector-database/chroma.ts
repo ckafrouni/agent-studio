@@ -1,18 +1,12 @@
 import { env } from "~/env";
-import { OpenAIEmbeddings } from "@langchain/openai";
-import { ChromaClient } from "chromadb";
+import { ChromaClient, OpenAIEmbeddingFunction } from "chromadb";
 
 // MARK: - Embedding
-const openAIEmbeddings = new OpenAIEmbeddings({
-  apiKey: env.OPENAI_API_KEY,
-  model: env.OPENAI_EMBEDDING_MODEL,
+const embeddingFunction = new OpenAIEmbeddingFunction({
+  openai_api_key: env.OPENAI_API_KEY,
+  // Explicitly set the model to match the collection's expected 3072 dimensions
+  openai_model: "text-embedding-3-large",
 });
-
-const embeddingFunction = {
-  generate: async (texts: string[]) => {
-    return openAIEmbeddings.embedDocuments(texts);
-  },
-};
 
 const client = new ChromaClient();
 

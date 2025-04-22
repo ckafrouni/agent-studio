@@ -96,7 +96,7 @@ export default function Home() {
   }, [turns]);
 
   return (
-    <div className="container mx-auto flex flex-col h-screen p-4">
+    <div className="container mx-auto flex flex-col p-4 pt-24 min-h-screen">
       <div
         id="turns-container"
         ref={turnsContainerRef}

@@ -5,6 +5,7 @@ import { BaseMessage, SystemMessage } from "@langchain/core/messages";
 import { PromptTemplate } from "@langchain/core/prompts";
 import { DocumentInterface } from "@langchain/core/documents";
 import { collection } from "~/lib/vector-database/chroma";
+import { ChromaNotFoundError } from "chromadb";
 
 export interface Document extends DocumentInterface {
   metadata: {
@@ -39,23 +40,50 @@ const model = new ChatOpenAI({
 // MARK: - Retrieval Function
 const doc_retriever = async (state: GraphAnnotationType) => {
   const query = state.messages[state.messages.length - 1].content as string;
+  let documents: any[] = []; // Default to empty array
 
-  const results = await collection.query({
-    nResults: 3,
-    queryTexts: [query],
-  });
+  try {
+    const results = await collection.query({
+      nResults: 3,
+      queryTexts: [query],
+    });
 
-  const documents = results.documents[0]
-    .map((doc, i) => ({
-      pageContent: doc,
-      metadata: {
-        id: results.ids[0][i],
-        distance: results.distances?.[0][i] ?? 1,
-      },
-    }))
-    .filter((doc) => doc.metadata.distance < 0.8);
+    // Check if results and documents exist before processing
+    if (
+      results &&
+      results.documents &&
+      results.documents.length > 0 &&
+      results.documents[0]
+    ) {
+      documents = results.documents[0]
+        .map((doc, i) => ({
+          pageContent: doc,
+          metadata: {
+            id: results.ids?.[0]?.[i], // Add safe navigation
+            distance: results.distances?.[0]?.[i] ?? 1, // Add safe navigation
+          },
+        }))
+        .filter((doc) => doc.metadata.distance < 0.9);
+    } else {
+      console.warn(
+        "Chroma query returned no documents or unexpected structure."
+      );
+    }
+  } catch (error: any) {
+    // Check if it's the specific "Not Found" error
+    if (error instanceof ChromaNotFoundError) {
+      console.warn(
+        "Collection not found or empty during query, returning no documents."
+      );
+      // documents array is already initialized as empty, so just proceed
+    } else {
+      // Log other unexpected errors
+      console.error("Error during document retrieval query:", error);
+      // Optionally re-throw or handle differently, but returning empty documents is often safest for the graph
+    }
+  }
 
-  return { documents };
+  return { documents }; // Return the potentially empty documents array
 };
 
 // MARK: - Check Retrieval Quality
