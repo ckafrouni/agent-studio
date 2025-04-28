@@ -46,7 +46,6 @@ const doc_retriever = async (state: GraphAnnotationType) => {
       nResults: 5,
       queryTexts: [query],
     });
-    console.log("[doc_retriever] Query results:", results);
 
     if (
       results &&
@@ -64,7 +63,7 @@ const doc_retriever = async (state: GraphAnnotationType) => {
         }))
         .filter((doc) => {
           const distance = doc.metadata.distance;
-          return distance !== null && (distance < 0.8 || distance >= 1.2);
+          return distance !== null && distance < 0.8;
         });
     } else {
       console.warn(

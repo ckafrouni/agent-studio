@@ -12,4 +12,5 @@ const client = new ChromaClient();
 export const collection = await client.getOrCreateCollection({
   name: env.CHROMA_COLLECTION_NAME,
   embeddingFunction: embeddingFunction,
+  metadata: { "hnsw:space": "cosine" },
 });
