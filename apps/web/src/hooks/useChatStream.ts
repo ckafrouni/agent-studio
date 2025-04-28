@@ -8,11 +8,13 @@ import type { Turn, GraphUpdate, Document } from "@/types/chat";
 import { isAIMessageChunk } from "@/lib/utils";
 import { env } from "@/env";
 
+export type Workflow = "vector-rag" | "web-search-rag";
+
 export function useChatStream() {
   const [turns, setTurns] = useState<Turn[]>([]);
 
   const sendMessage = useCallback(
-    async (prompt: string, workflow: "vector-rag" | "web-search-rag") => {
+    async (prompt: string, workflow: Workflow) => {
       // Add user message immediately
       setTurns((prevTurns) => [
         ...prevTurns,
@@ -77,7 +79,10 @@ export function useChatStream() {
 
               // Check if parsedData is the expected array structure
               if (!Array.isArray(parsedData) || parsedData.length !== 2) {
-                console.warn("Received unexpected NDJSON structure:", parsedData);
+                console.warn(
+                  "Received unexpected NDJSON structure:",
+                  parsedData
+                );
                 continue;
               }
 
@@ -89,7 +94,9 @@ export function useChatStream() {
                 const nodeKeys = Object.keys(update);
                 if (nodeKeys.length > 0) {
                   const stepName = nodeKeys[0];
-                  const stepData = (update as Record<string, unknown>)[stepName];
+                  const stepData = (update as Record<string, unknown>)[
+                    stepName
+                  ];
                   setTurns((prevTurns) => {
                     const lastTurnIndex = prevTurns.length - 1;
                     if (lastTurnIndex < 0) return prevTurns;

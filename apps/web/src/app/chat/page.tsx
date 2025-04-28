@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { useChatStream } from "@/hooks/useChatStream";
+import { useChatStream, Workflow } from "@/hooks/useChatStream";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import {
@@ -13,11 +13,14 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { useQueryState } from "nuqs";
 
 export default function Home() {
   const { turns, sendMessage } = useChatStream();
   const [input, setInput] = useState("");
-  const [selectedWorkflow, setSelectedWorkflow] = useState<'vector-rag' | 'web-search-rag'>('vector-rag');
+  const [selectedWorkflow, setSelectedWorkflow] = useQueryState("workflow", {
+    defaultValue: "vector-rag",
+  });
   const turnsContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -67,40 +70,38 @@ export default function Home() {
 
             {turn.ai && (
               <div className="prose dark:prose-invert max-w-none text-foreground">
-                {/* Directly render AI content using ReactMarkdown */}
-                <ReactMarkdown
-                  remarkPlugins={[remarkGfm]} // Add GFM plugin
-                  components={{
-                    // Custom renderer for link (a) tags
-                    a: ({ /* node is unused */ ...props }) => (
-                      <a
-                        {...props}
-                        target="_blank" // Open in new tab
-                        rel="noopener noreferrer" // Security measure for target="_blank"
-                      />
-                    ),
-                  }}
-                >
-                  {turn.ai.content as string}
-                </ReactMarkdown>
+                <div className="text-sm">
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    components={{
+                      a: ({ ...props }) => (
+                        <a
+                          {...props}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-purple-400 hover:text-purple-600 px-0.5"
+                        />
+                      ),
+                    }}
+                  >
+                    {turn.ai.content as string}
+                  </ReactMarkdown>
+                </div>
               </div>
             )}
           </div>
         ))}
       </div>
 
-      {/* Workflow Toggle Switch */}
       <div className="flex items-center space-x-2 mb-2 sticky bottom-[70px] bg-background py-2">
         <Switch
           id="workflow-toggle"
-          checked={selectedWorkflow === 'web-search-rag'}
+          checked={selectedWorkflow === "web-search-rag"}
           onCheckedChange={(checked) => {
-            setSelectedWorkflow(checked ? 'web-search-rag' : 'vector-rag');
+            setSelectedWorkflow(checked ? "web-search-rag" : "vector-rag");
           }}
         />
-        <Label htmlFor="workflow-toggle">
-          Use Web Search Fallback (Current: {selectedWorkflow === 'web-search-rag' ? 'Web Search' : 'Vector Store Only'})
-        </Label>
+        <Label htmlFor="workflow-toggle">Use Web Search Fallback</Label>
       </div>
 
       <form
@@ -112,7 +113,7 @@ export default function Home() {
           if (!prompt) return;
 
           setInput("");
-          await sendMessage(prompt, selectedWorkflow);
+          await sendMessage(prompt, selectedWorkflow as Workflow);
         }}
       >
         <Input
@@ -123,7 +124,9 @@ export default function Home() {
           placeholder="Ask anything..."
           className="flex-1"
         />
-        <Button type="submit" disabled={!input.trim()}>Submit</Button> {/* Disable button if input is empty */}
+        <Button type="submit" disabled={!input.trim()}>
+          Submit
+        </Button>
       </form>
     </div>
   );
