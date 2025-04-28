@@ -9,7 +9,7 @@
     "sonner": "^2.0.3"
   },
   "devDependencies": {
-    "turbo": "^2.5.0"
+    "turbo": "^2.5.2"
   },
   "workspaces": [
     "apps/*",
