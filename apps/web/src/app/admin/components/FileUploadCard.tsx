@@ -24,16 +24,29 @@ export function FileUploadCard({ onUploadSuccess }: FileUploadCardProps) {
 
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
-      if (acceptedFiles.length > 0) {
-        const file = acceptedFiles[0];
-        if (!file) return;
+      if (acceptedFiles.length === 0) {
+        const msg = "No valid files selected or dropped.";
+        toast.warning(msg);
+        setUploadError(msg);
+        return;
+      }
 
-        setIsUploading(true);
-        setUploadError(null);
+      setIsUploading(true);
+      setUploadError(null);
+      let overallSuccess = true;
+      let lastError = null;
+
+      // Inform user that multiple uploads are starting
+      toast.info(`Starting upload for ${acceptedFiles.length} file(s)...`);
+
+      for (const file of acceptedFiles) {
         const formData = new FormData();
         formData.append("file", file);
 
         try {
+          // Optional: Show toast for each file starting
+          // toast.info(`Uploading ${file.name}...`);
+
           const response = await fetch(
             `${env.NEXT_PUBLIC_SERVER_URL}/api/files/upload`,
             {
@@ -45,29 +58,36 @@ export function FileUploadCard({ onUploadSuccess }: FileUploadCardProps) {
           const result = await response.json();
 
           if (!response.ok) {
+            // Use specific message from backend if available
             throw new Error(
-              result.message || `HTTP error! status: ${response.status}`
+              result.message || `Upload failed for ${file.name} (Status: ${response.status})`
             );
           }
 
+          // Success toast for each file
           toast.success(
             result.message ?? `Successfully processed ${file.name}.`
           );
-          onUploadSuccess(); // Call the callback to refresh the list in parent
+          onUploadSuccess(); // Refresh list after each successful upload
+
         } catch (error) {
-          console.error("Upload failed:", error);
+          overallSuccess = false;
+          console.error(`Upload failed for ${file.name}:`, error);
           const errorMessage =
-            error instanceof Error ? error.message : "File upload failed.";
-          toast.error(errorMessage);
-          setUploadError(errorMessage);
-        } finally {
-          setIsUploading(false);
+            error instanceof Error ? error.message : `Upload failed for ${file.name}.`;
+          toast.error(errorMessage); // Error toast for the specific file
+          lastError = errorMessage; // Keep track of the last error message
         }
-      } else {
-        const msg =
-          "Invalid file type or size. Please upload PDF, DOCX, TXT, or MD files.";
-        toast.warning(msg);
-        setUploadError(msg);
+      } // End of loop
+
+      // After all uploads are attempted
+      setIsUploading(false);
+      if (!overallSuccess && lastError) {
+        // Optionally set a general error state if needed, using the last error
+        setUploadError(lastError);
+      } else if (overallSuccess) {
+        // Clear any previous error message if all were successful
+        setUploadError(null);
       }
     },
     [onUploadSuccess]
@@ -78,12 +98,13 @@ export function FileUploadCard({ onUploadSuccess }: FileUploadCardProps) {
       onDrop,
       accept: {
         "application/pdf": [".pdf"],
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-          [".docx"],
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [
+          ".docx",
+        ],
         "text/plain": [".txt"],
         "text/markdown": [".md"],
       },
-      multiple: false,
+      multiple: true, // Allow multiple files
       maxSize: 10 * 1024 * 1024, // 10MB limit
     });
 
@@ -109,7 +130,7 @@ export function FileUploadCard({ onUploadSuccess }: FileUploadCardProps) {
           ) : isDragActive ? (
             <p>Drop the file here ...</p>
           ) : (
-            <p>Drag &apos;n&apos; drop a file here, or click to select file</p>
+            <p>Drag &apos;n&apos; drop file(s) here, or click to select file(s)</p>
           )}
         </div>
         {uploadError && (
