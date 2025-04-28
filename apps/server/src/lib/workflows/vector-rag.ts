@@ -34,21 +34,20 @@ export type GraphAnnotationType = typeof GraphAnnotation.State;
 const model = new ChatOpenAI({
   apiKey: env.OPENAI_API_KEY,
   model: env.OPENAI_CHAT_MODEL,
-  // streaming: true,
 });
 
 // MARK: - Retrieval Function
 const doc_retriever = async (state: GraphAnnotationType) => {
   const query = state.messages[state.messages.length - 1].content as string;
-  let documents: any[] = []; // Default to empty array
+  let documents: any[] = [];
 
   try {
     const results = await collection.query({
       nResults: 5,
       queryTexts: [query],
     });
+    console.log("[doc_retriever] Query results:", results);
 
-    // Check if results and documents exist before processing
     if (
       results &&
       results.documents &&
@@ -59,31 +58,30 @@ const doc_retriever = async (state: GraphAnnotationType) => {
         .map((doc, i) => ({
           pageContent: doc,
           metadata: {
-            id: results.ids?.[0]?.[i], // Add safe navigation
-            distance: results.distances?.[0]?.[i] ?? 1, // Add safe navigation
+            id: results.ids?.[0]?.[i],
+            distance: results.distances?.[0]?.[i] ?? 1,
           },
         }))
-        .filter((doc) => doc.metadata.distance < 0.9);
+        .filter((doc) => {
+          const distance = doc.metadata.distance;
+          return distance !== null && (distance < 0.8 || distance >= 1.2);
+        });
     } else {
       console.warn(
         "Chroma query returned no documents or unexpected structure."
       );
     }
   } catch (error: any) {
-    // Check if it's the specific "Not Found" error
     if (error instanceof ChromaNotFoundError) {
       console.warn(
         "Collection not found or empty during query, returning no documents."
       );
-      // documents array is already initialized as empty, so just proceed
     } else {
-      // Log other unexpected errors
       console.error("Error during document retrieval query:", error);
-      // Optionally re-throw or handle differently, but returning empty documents is often safest for the graph
     }
   }
 
-  return { documents }; // Return the potentially empty documents array
+  return { documents };
 };
 
 // MARK: - Check Retrieval Quality
@@ -119,8 +117,6 @@ const generator = async (state: GraphAnnotationType) => {
     new SystemMessage(prompt),
   ]);
 
-  // Append the retrieved documents to the final message's metadata
-  // This isn't strictly necessary for citation but useful for potential client-side linking
   response.response_metadata = {
     ...(response.response_metadata || {}),
     source_documents: state.documents,
