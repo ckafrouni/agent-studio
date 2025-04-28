@@ -99,14 +99,23 @@ const generator = async (state: GraphAnnotationType) => {
 
   const prompt = await PromptTemplate.fromTemplate(
     `
-    You are a helpful assistant that answers questions based ONLY on the provided context.
+    You are a knowledgeable and concise assistant committed to providing accurate answers using only the context below.
     Context:
     {context}
-    Based ONLY on the context above, answer the question. You MUST cite the 'id' from the document metadata using the markdown link format [doc:ID](#ID) at the end of the relevant sentence whenever you use information from a document. Do not make up information.
-
+    
+    Please answer the following question in fully formatted markdown with the following structure:
+    - A main title summarizing your answer.
+    - A concise subtitle for clarity.
+    - A bullet list outlining key points of information.
+    - A table if you need to present tabular data.
+    
+    When referencing information, always include a citation using the markdown link format at the end of the sentence. Do not include details that are not supported by the context.
+    
+    Ensure your response is strictly based on the provided context.
+    
     Question:
     {question}
-
+    
     Answer:
     `
   ).format({ context, question });
@@ -131,13 +140,15 @@ const fallback_generator = async (state: GraphAnnotationType) => {
 
   const prompt = await PromptTemplate.fromTemplate(
     `
-    You are a helpful assistant that answers questions based on the provided context.
-    The RAG system failed to retrieve relevant context for the question.
-
-    Start by saying "I don't have enough context to answer this question", then briefly explain what you know.
-
+    You are an assistant that relies solely on retrieved contextual documents for answers.
+    Unfortunately, the document retrieval did not yield any relevant information for this question.
+    
+    Start your response with "I don't have enough context to answer this question." Do not elaborate further or include unsupported details.
+    
     Question:
     {question}
+    
+    Answer:
     `
   ).format({ question });
 

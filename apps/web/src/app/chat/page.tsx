@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { useChatStream } from "@/hooks/useChatStream";
-import { Document } from "@/types/chat"; // Import the client-side Document type
+import ReactMarkdown from 'react-markdown'; 
 import {
   Accordion,
   AccordionContent,
@@ -10,73 +10,6 @@ import {
 } from "@/components/ui/accordion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Badge } from "@/components/ui/badge";
-
-// Component to render AI response with citations
-const AICitationResponse = ({
-  content,
-  documents,
-}: {
-  content: string;
-  documents?: Document[];
-}) => {
-  if (!documents || documents.length === 0) {
-    return <div>{content}</div>;
-  }
-
-  // Matches [doc: suivi par des lettres/chiffres/underscores] suivi par (#quelque chose)
-  const citationRegex = /\[doc:(\w+)\]\(.*?\)/g;
-  const parts = content.split(citationRegex);
-
-  return (
-    <div>
-      {parts.map((part, index) => {
-        // Even indices are text, odd indices are doc IDs
-        if (index % 2 === 0) {
-          return <span key={index}>{part}</span>;
-        } else {
-          const docId = part;
-          const document = documents.find((doc) => doc.metadata.id === docId);
-
-          return (
-            <Popover key={index}>
-              <PopoverTrigger asChild>
-                <Badge
-                  variant="outline"
-                  className="cursor-pointer mx-1 hover:bg-accent hover:text-accent-foreground"
-                >
-                  [doc:{docId}]
-                </Badge>
-              </PopoverTrigger>
-              <PopoverContent className="w-80 text-sm">
-                {document ? (
-                  <div className="space-y-2">
-                    <h4 className="font-medium leading-none">
-                      Source Document
-                    </h4>
-                    <p className="text-muted-foreground">
-                      ID: {document.metadata.id}
-                    </p>
-                    <p className="max-h-40 overflow-y-auto">
-                      {document.pageContent}
-                    </p>
-                  </div>
-                ) : (
-                  "Document not found"
-                )}
-              </PopoverContent>
-            </Popover>
-          );
-        }
-      })}
-    </div>
-  );
-};
 
 export default function Home() {
   const { turns, sendMessage } = useChatStream();
@@ -129,10 +62,12 @@ export default function Home() {
             )}
 
             {turn.ai && (
-              <AICitationResponse
-                content={turn.ai.content as string}
-                documents={turn.sourceDocuments}
-              />
+              <div className="prose dark:prose-invert max-w-none text-foreground">
+                {/* Directly render AI content using ReactMarkdown */}
+                <ReactMarkdown>
+                  {turn.ai.content as string}
+                </ReactMarkdown>
+              </div>
             )}
           </div>
         ))}
