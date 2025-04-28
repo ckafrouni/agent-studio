@@ -3,12 +3,9 @@ import { stream } from "hono/streaming";
 import type { BaseMessage } from "@langchain/core/messages";
 import type { IterableReadableStream } from "@langchain/core/utils/stream";
 import type { CompiledStateGraph } from "@langchain/langgraph";
-import vectorRagWorkflow from "~/lib/workflows/vector-rag";
 
-// Define a generic type for the workflow input that expects at least 'messages'
 type WorkflowInput = { messages: BaseMessage[] };
-// Define a base type for the CompiledStateGraph that streamMessages can work with
-type StreamableWorkflow = CompiledStateGraph<any, Partial<WorkflowInput>, any>; // Use 'any' for flexibility, ensure input has 'messages'
+type StreamableWorkflow = CompiledStateGraph<any, Partial<WorkflowInput>, any>;
 
 export const streamMessages = async (
   workflow: StreamableWorkflow,

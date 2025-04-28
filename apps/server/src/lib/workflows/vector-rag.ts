@@ -17,7 +17,7 @@ export interface Document extends DocumentInterface {
 
 export type Routes = "generator" | "fallback";
 
-const formatDocumentsAsString = (docs: Document[]): string => {
+const extractContextFromDocumentRetrieval = (docs: Document[]): string => {
   return docs
     .map(
       (doc, index) =>
@@ -102,7 +102,7 @@ const generator = async (state: GraphAnnotationType) => {
   const last_message = state.messages[state.messages.length - 1];
   const question = last_message.content as string;
 
-  const context = formatDocumentsAsString(state.documents);
+  const context = extractContextFromDocumentRetrieval(state.documents);
 
   const prompt = await PromptTemplate.fromTemplate(
     `

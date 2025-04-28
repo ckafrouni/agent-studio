@@ -6,7 +6,7 @@ import { PromptTemplate } from "@langchain/core/prompts";
 import { DocumentInterface } from "@langchain/core/documents";
 import { collection } from "~/lib/vector-database/chroma";
 import { ChromaNotFoundError } from "chromadb";
-import { TavilySearchResults } from "@langchain/community/tools/tavily_search";
+import { TavilySearch, TavilySearchResponse } from "@langchain/tavily";
 
 export interface Document extends DocumentInterface {
   metadata: {
@@ -18,19 +18,36 @@ export interface Document extends DocumentInterface {
 
 export type Routes = "generator" | "web_searcher";
 
-const formatDocumentsAsString = (docs: Document[]): string => {
+const extractContextFromDocumentRetrieval = (docs: Document[]): string => {
   return docs
     .map(
       (doc, index) =>
-        `[Index: ${index + 1} | Source: ${doc.metadata.source} | ID: ${doc.metadata.id}] ${doc.pageContent}`
+        `[Index: ${index + 1} | Source: ${doc.metadata.source} | ID: ${
+          doc.metadata.id
+        }] ${doc.pageContent}`
     )
     .join("\n\n");
+};
+
+const extractContextFromTavilyResponse = (
+  response: TavilySearchResponse
+): string => {
+  if (!response || response.length === 0) {
+    return "No web search results found.";
+  }
+  return response.results
+    .map(
+      (result, index) =>
+        `[Index: ${index + 1} | URL: ${result.url} | Title: ${result.title}]
+${result.content}`
+    )
+    .join("\n\n---\n\n");
 };
 
 export const GraphAnnotation = Annotation.Root({
   messages: Annotation<BaseMessage[]>,
   documents: Annotation<Document[]>,
-  web_context: Annotation<string | null>,
+  web_context: Annotation<TavilySearchResponse | null>,
   routing: Annotation<Routes>,
 });
 
@@ -105,7 +122,7 @@ const generator = async (state: GraphAnnotationType) => {
   const last_message = state.messages[state.messages.length - 1];
   const question = last_message.content as string;
 
-  const context = formatDocumentsAsString(state.documents);
+  const context = extractContextFromDocumentRetrieval(state.documents);
 
   const prompt = await PromptTemplate.fromTemplate(
     `
@@ -152,38 +169,45 @@ const web_searcher = async (state: GraphAnnotationType) => {
   const last_message = state.messages[state.messages.length - 1];
   const question = last_message.content as string;
 
-  console.log("--- Performing Web Search ---");
-  const tool = new TavilySearchResults({
+  const tool = new TavilySearch({
     maxResults: 3,
-    apiKey: env.TAVILY_API_KEY, // Ensure TAVILY_API_KEY is set in env
+    tavilyApiKey: env.TAVILY_API_KEY,
   });
-  const web_context = await tool.invoke(question);
-  console.log("Web search context:", web_context);
+  const web_context = await tool.invoke({ query: question });
 
   if (!web_context) {
     console.warn("Tavily search returned no results.");
-    // Optional: Could add a specific route/node here if web search fails
+    return { web_context: "No relevant information found after web search." };
   }
 
   return { web_context };
 };
 
 // MARK: - Generate Response with Web Context
-// Generates a response using the context found from the web search.
 const web_generator = async (state: GraphAnnotationType) => {
   const last_message = state.messages[state.messages.length - 1];
   const question = last_message.content as string;
 
-  const web_context = state.web_context ?? "No web context found.";
+  const web_context = extractContextFromTavilyResponse(state.web_context!);
 
   const prompt = await PromptTemplate.fromTemplate(
     `
-    You are a helpful assistant. You couldn't find relevant information in the local document knowledge base.
-    Please answer the following question based SOLELY on the web search context provided below.
-    Be concise and do not make up information.
-
+    You are a helpful assistant. You couldn't find relevant information in the local document knowledge base, but you have access to the web.
     Web Search Context:
     {web_context}
+    
+    Please answer the following question in fully formatted markdown with the following structure:
+    - A main title summarizing your answer.
+    - A concise subtitle for clarity.
+    - A bullet list outlining key points of information.
+    - A table if you need to present tabular data.
+    
+    When referencing information from a specific source document listed in the context above (e.g., '[Source: example.pdf | ID: some_id]'), you MUST include a citation at the end of the relevant sentence. 
+    Format the citation as a relative markdown link: '[[Index](URL)]'. Replace URL with the actual URL you extracted from the '[Source: URL | ID: ...]' part of the context for that document. 
+    **Important:** Replace the '[Index]' part of the link text with the actual index number (e.g., '[1]', '[2]') corresponding to the '[Index: N | ...]' line in the context you are citing.
+    Do not include details that are not supported by the context.
+    
+    Ensure your response is strictly based on the provided context.
     
     Question:
     {question}
@@ -206,17 +230,13 @@ export const webSearchRagGraph = new StateGraph(GraphAnnotation)
   .addNode("retriever", doc_retriever)
   .addNode("checker", rag_checker)
   .addNode("generator", generator)
-  // Add new nodes for web search
   .addNode("web_searcher", web_searcher)
   .addNode("web_generator", web_generator)
-  // Define edges
   .addEdge(START, "retriever")
   .addEdge("retriever", "checker")
-  // Conditional routing based on checker output
   .addConditionalEdges("checker", (state) => state.routing)
-  // Edges from conditional routes
   .addEdge("generator", END)
-  .addEdge("web_searcher", "web_generator") // Route from web search to web generator
+  .addEdge("web_searcher", "web_generator")
   .addEdge("web_generator", END);
 
 export default webSearchRagGraph.compile();

@@ -16,6 +16,7 @@
         "@langchain/core": "^0.3.44",
         "@langchain/langgraph": "^0.2.63",
         "@langchain/openai": "^0.5.6",
+        "@langchain/tavily": "^0.1.1",
         "@langchain/textsplitters": "^0.1.0",
         "@t3-oss/env-core": "^0.12.0",
         "@types/mime-types": "^2.1.4",
@@ -270,6 +271,8 @@
     "@langchain/langgraph-sdk": ["@langchain/langgraph-sdk@0.0.68", "", { "dependencies": { "@types/json-schema": "^7.0.15", "p-queue": "^6.6.2", "p-retry": "4", "uuid": "^9.0.0" }, "peerDependencies": { "@langchain/core": ">=0.2.31 <0.4.0", "react": "^18 || ^19" }, "optionalPeers": ["@langchain/core", "react"] }, "sha512-8HwUs4Hrr160bydgxnv+tDCYkPiAz7GsywkVmCb0Rb3cVzYu8mMPBhcbY4Wf+90grZp4p4mAYio90r4qJJaKAQ=="],
 
     "@langchain/openai": ["@langchain/openai@0.5.6", "", { "dependencies": { "js-tiktoken": "^1.0.12", "openai": "^4.93.0", "zod": "^3.22.4", "zod-to-json-schema": "^3.22.3" }, "peerDependencies": { "@langchain/core": ">=0.3.39 <0.4.0" } }, "sha512-zN0iyJthPNmcefIBVybZwcTBgcqu/ElJFov42ZntxEncK4heOMAE9lkq9LQ5CaPU/SgrduibrM1oL57+tLUtaA=="],
+
+    "@langchain/tavily": ["@langchain/tavily@0.1.1", "", { "dependencies": { "zod": "^3.24.2" }, "peerDependencies": { "@langchain/core": ">=0.3.39 <0.4.0" } }, "sha512-nvg/gJkt9F8xOlMDoP8YR22BdUz9IjsHFYp3LjCsjFq2SMlKicIWDP9M8Z4Pv0Zd9zHYk4v9Ljr3TZfCj39LRA=="],
 
     "@langchain/textsplitters": ["@langchain/textsplitters@0.1.0", "", { "dependencies": { "js-tiktoken": "^1.0.12" }, "peerDependencies": { "@langchain/core": ">=0.2.21 <0.4.0" } }, "sha512-djI4uw9rlkAb5iMhtLED+xJebDdAG935AdP4eRTB02R7OB/act55Bj9wsskhZsvuyQRpO4O1wQOp85s6T6GWmw=="],
 
