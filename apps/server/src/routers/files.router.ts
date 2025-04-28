@@ -3,6 +3,12 @@ import { z } from "zod";
 import { collection } from "~/lib/vector-database/chroma";
 import { processAndStoreFile } from "~/lib/services/file-processing.service";
 import { IncludeEnum, ChromaNotFoundError } from "chromadb";
+import mime from "mime-types";
+import { s3Client, bucketName } from "~/lib/s3/client"; 
+import { GetObjectCommand, NoSuchKey } from "@aws-sdk/client-s3";
+import { stream } from 'hono/streaming' // Import the stream helper
+import type { Readable } from 'node:stream'; // Import Readable type for casting
+import { Readable as NodeReadable } from 'node:stream'; // Import specifically for .toWeb()
 
 // --- Zod Schemas (keep these for validation within functions) ---
 const SearchSchema = z.object({
@@ -164,6 +170,70 @@ export async function deleteDocumentBySource(source: string) {
 // --- Hono Router Definition ---
 const filesRouter = new Hono();
 
+filesRouter.get("/content", async (c) => {
+  const source = c.req.query("source");
+
+  if (!source) {
+    return c.json({ error: "Missing 'source' query parameter" }, 400);
+  }
+
+  // Basic sanitization: prevent directory traversal. 
+  // S3 keys don't have the same filesystem risks, but good practice.
+  if (source.includes("..") || source.startsWith("/")) {
+    return c.json({ error: "Invalid source filename" }, 400);
+  }
+
+  const getObjectParams = {
+    Bucket: bucketName,
+    Key: source,
+  };
+
+  try {
+    const command = new GetObjectCommand(getObjectParams);
+    const s3Response = await s3Client.send(command);
+
+    // Check if Body is a readable stream (expected for successful GetObject)
+    if (!s3Response.Body) { // Simplified check: just ensure Body exists
+        throw new Error('S3 response body is not a readable stream.');
+    }
+
+    // Determine Content-Type from S3 metadata or mime-types fallback
+    const contentType = s3Response.ContentType || mime.lookup(source) || 'application/octet-stream';
+    c.header("Content-Type", contentType);
+
+    // Set Content-Disposition to suggest filename to browser
+    c.header("Content-Disposition", `inline; filename="${source}"`); 
+
+    // Use the imported stream helper
+    return stream(c, async (streamInstance) => { 
+        // Ensure the body is a Node Readable before converting
+        if (s3Response.Body instanceof NodeReadable) {
+            // Manually pipe data from Node stream to Hono stream
+            for await (const chunk of s3Response.Body) {
+                await streamInstance.write(chunk);
+            }
+            // Note: Hono's stream helper might automatically close the streamInstance
+            // when this async function completes. If issues arise, explicitly call
+            // await streamInstance.close(); here.
+        } else {
+            // Handle cases where Body might not be a Node Readable (e.g., error or unexpected type)
+            console.error("S3 response body is not a Node.js Readable stream");
+            // Optionally, close the stream with an error or provide a fallback
+            await streamInstance.close(); 
+        }
+    });
+
+  } catch (error: any) {
+    if (error instanceof NoSuchKey || error.name === 'NoSuchKey') { // Check error type for S3
+      console.error(`File not found in S3: ${bucketName}/${source}`);
+      return c.json({ error: "File not found" }, 404);
+    } else {
+      console.error(`Error fetching file ${source} from S3:`, error);
+      return c.json({ error: "Failed to retrieve file" }, 500);
+    }
+  }
+});
+
 filesRouter.get("/", async (c) => {
   try {
     const result = await listDocuments();
@@ -234,6 +304,71 @@ filesRouter.post("/search", async (c) => {
     console.error("[POST /api/files/search] Error:", error);
     const message = error instanceof Error ? error.message : "Search failed";
     return c.json({ error: message }, 500);
+  }
+});
+
+filesRouter.get("/content/:source", async (c) => {
+  console.log(`[GET /content/:source] Handling request for source: ${c.req.param('source')}`);
+  const source = c.req.param('source');
+
+  if (!source) {
+    return c.json({ error: "Missing 'source' query parameter" }, 400);
+  }
+
+  // Basic sanitization: prevent directory traversal. 
+  // S3 keys don't have the same filesystem risks, but good practice.
+  if (source.includes("..") || source.startsWith("/")) {
+    return c.json({ error: "Invalid source filename" }, 400);
+  }
+
+  const getObjectParams = {
+    Bucket: bucketName,
+    Key: source,
+  };
+
+  try {
+    const command = new GetObjectCommand(getObjectParams);
+    const s3Response = await s3Client.send(command);
+
+    // Check if Body is a readable stream (expected for successful GetObject)
+    if (!s3Response.Body) { // Simplified check: just ensure Body exists
+        throw new Error('S3 response body is not a readable stream.');
+    }
+
+    // Determine Content-Type from S3 metadata or mime-types fallback
+    const contentType = s3Response.ContentType || mime.lookup(source) || 'application/octet-stream';
+    c.header("Content-Type", contentType);
+
+    // Set Content-Disposition to suggest filename to browser
+    c.header("Content-Disposition", `inline; filename="${source}"`); 
+
+    // Use the imported stream helper
+    return stream(c, async (streamInstance) => { 
+        // Ensure the body is a Node Readable before converting
+        if (s3Response.Body instanceof NodeReadable) {
+            // Manually pipe data from Node stream to Hono stream
+            for await (const chunk of s3Response.Body) {
+                await streamInstance.write(chunk);
+            }
+            // Note: Hono's stream helper might automatically close the streamInstance
+            // when this async function completes. If issues arise, explicitly call
+            // await streamInstance.close(); here.
+        } else {
+            // Handle cases where Body might not be a Node Readable (e.g., error or unexpected type)
+            console.error("S3 response body is not a Node.js Readable stream");
+            // Optionally, close the stream with an error or provide a fallback
+            await streamInstance.close(); 
+        }
+    });
+
+  } catch (error: any) {
+    if (error instanceof NoSuchKey || error.name === 'NoSuchKey') { // Check error type for S3
+      console.error(`File not found in S3: ${bucketName}/${source}`);
+      return c.json({ error: "File not found" }, 404);
+    } else {
+      console.error(`Error fetching file ${source} from S3:`, error);
+      return c.json({ error: "Failed to retrieve file" }, 500);
+    }
   }
 });
 

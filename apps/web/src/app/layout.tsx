@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { NavBar } from "@/components/layout/navbar/NavBar";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "My RAG App",
@@ -17,6 +18,7 @@ export default function RootLayout({
       <body className="antialiased">
         <NavBar />
         <main className="">{children}</main>
+        <Toaster position="bottom-left" />
       </body>
     </html>
   );

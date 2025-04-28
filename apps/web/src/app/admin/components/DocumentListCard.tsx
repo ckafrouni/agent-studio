@@ -63,18 +63,24 @@ export function DocumentListCard({
                 key={doc.id}
                 className="flex items-center justify-between rounded-md border p-3"
               >
-                <span
-                  className="truncate text-sm font-medium"
+                <a
+                  href={`/api/files/content/${encodeURIComponent(
+                    doc.metadata?.source ?? ""
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="truncate text-sm font-medium hover:underline"
                   title={doc.metadata?.source ?? "Unknown Source"}
                 >
                   {doc.metadata?.source ?? "Unknown Source"}
-                </span>
+                </a>
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => onDeleteClick(doc)}
                   disabled={isDeleting && docBeingDeletedId === doc.id}
                   aria-label={`Delete ${doc.metadata?.source ?? "document"}`}
+                  className="hover:cursor-pointer"
                 >
                   {isDeleting && docBeingDeletedId === doc.id ? (
                     <Loader2 className="h-4 w-4 animate-spin" />

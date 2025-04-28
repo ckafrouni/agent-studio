@@ -1,7 +1,8 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { useChatStream } from "@/hooks/useChatStream";
-import ReactMarkdown from 'react-markdown'; 
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import {
   Accordion,
   AccordionContent,
@@ -64,7 +65,19 @@ export default function Home() {
             {turn.ai && (
               <div className="prose dark:prose-invert max-w-none text-foreground">
                 {/* Directly render AI content using ReactMarkdown */}
-                <ReactMarkdown>
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]} // Add GFM plugin
+                  components={{
+                    // Custom renderer for link (a) tags
+                    a: ({ /* node is unused */ ...props }) => (
+                      <a
+                        {...props}
+                        target="_blank" // Open in new tab
+                        rel="noopener noreferrer" // Security measure for target="_blank"
+                      />
+                    ),
+                  }}
+                >
                   {turn.ai.content as string}
                 </ReactMarkdown>
               </div>

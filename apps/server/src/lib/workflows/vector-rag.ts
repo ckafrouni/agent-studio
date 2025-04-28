@@ -11,6 +11,7 @@ export interface Document extends DocumentInterface {
   metadata: {
     id: string;
     distance: number;
+    source: string;
   };
 }
 
@@ -18,7 +19,12 @@ export type Routes = "generator" | "fallback";
 
 const formatDocumentsAsString = (docs: Document[]): string => {
   return docs
-    .map((doc) => `[doc:${doc.metadata.id}] ${doc.pageContent}`)
+    .map(
+      (doc, index) =>
+        `[Index: ${index + 1} | Source: ${doc.metadata.source} | ID: ${
+          doc.metadata.id
+        }] ${doc.pageContent}`
+    )
     .join("\n\n");
 };
 
@@ -59,6 +65,7 @@ const doc_retriever = async (state: GraphAnnotationType) => {
           metadata: {
             id: results.ids?.[0]?.[i],
             distance: results.distances?.[0]?.[i] ?? 1,
+            source: results.metadatas?.[0]?.[i]?.source,
           },
         }))
         .filter((doc) => {
@@ -109,7 +116,11 @@ const generator = async (state: GraphAnnotationType) => {
     - A bullet list outlining key points of information.
     - A table if you need to present tabular data.
     
-    When referencing information, always include a citation using the markdown link format at the end of the sentence. Do not include details that are not supported by the context.
+    When referencing information from a specific source document listed in the context above (e.g., '[Source: example.pdf | ID: some_id]'), you MUST include a citation at the end of the relevant sentence. 
+    Format the citation as a relative markdown link: '[[Index](/api/files/content/FILENAME)]'. Replace FILENAME with the actual filename you extracted from the '[Source: FILENAME | ID: ...]' part of the context for that document. 
+    **Important:** Replace the '[Index]' part of the link text with the actual index number (e.g., '[1]', '[2]') corresponding to the '[Index: N | ...]' line in the context you are citing.
+    Ensure the FILENAME in the link is properly URL-encoded if it contains spaces or special characters.
+    Do not include details that are not supported by the context.
     
     Ensure your response is strictly based on the provided context.
     
