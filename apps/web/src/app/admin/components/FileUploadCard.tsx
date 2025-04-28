@@ -65,7 +65,7 @@ export function FileUploadCard({ onUploadSuccess }: FileUploadCardProps) {
         }
       } else {
         const msg =
-          "Invalid file type or size. Please upload PDF, DOCX, or TXT files.";
+          "Invalid file type or size. Please upload PDF, DOCX, TXT, or MD files.";
         toast.warning(msg);
         setUploadError(msg);
       }
@@ -81,6 +81,7 @@ export function FileUploadCard({ onUploadSuccess }: FileUploadCardProps) {
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
           [".docx"],
         "text/plain": [".txt"],
+        "text/markdown": [".md"],
       },
       multiple: false,
       maxSize: 10 * 1024 * 1024, // 10MB limit
@@ -91,7 +92,7 @@ export function FileUploadCard({ onUploadSuccess }: FileUploadCardProps) {
       <CardHeader>
         <CardTitle>Upload Document</CardTitle>
         <CardDescription>
-          Upload PDF, DOCX, or TXT files (max 10MB).
+          Upload PDF, DOCX, TXT, or MD files (max 10MB).
         </CardDescription>
       </CardHeader>
       <CardContent>

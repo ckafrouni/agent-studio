@@ -18,7 +18,7 @@ import { toast } from "sonner";
 // Type definition from the original page
 interface SearchResultItem {
   id: string;
-  text: string;
+  document: string;
   metadata: {
     source?: string;
     distance: number;
@@ -144,7 +144,7 @@ export function SearchCard() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm">{result.text}</p>
+                  <p className="text-sm">{result.document}</p>
                 </CardContent>
               </Card>
             ))}

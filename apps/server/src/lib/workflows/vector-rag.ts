@@ -44,7 +44,7 @@ const doc_retriever = async (state: GraphAnnotationType) => {
 
   try {
     const results = await collection.query({
-      nResults: 3,
+      nResults: 5,
       queryTexts: [query],
     });
 

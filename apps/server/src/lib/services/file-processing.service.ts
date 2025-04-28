@@ -41,11 +41,28 @@ export async function processAndStoreFile(
       });
       docs = await loader.load();
       console.log(`PDF loaded. Found ${docs.length} document parts.`);
+      // Ensure correct source is set
+      docs.forEach((doc) => {
+        doc.metadata = { ...(doc.metadata || {}), source: fileName };
+      });
     } else if (fileType === "text/plain") {
       console.log("Using TextLoader...");
       const loader = new TextLoader(fileBlob);
       docs = await loader.load();
       console.log(`TXT loaded. Found ${docs.length} document parts.`);
+      // Ensure correct source is set
+      docs.forEach((doc) => {
+        doc.metadata = { ...(doc.metadata || {}), source: fileName };
+      });
+    } else if (fileType === "text/markdown") { // Added block for Markdown
+      console.log("Using TextLoader for Markdown...");
+      const loader = new TextLoader(fileBlob);
+      docs = await loader.load();
+      console.log(`Markdown loaded. Found ${docs.length} document parts.`);
+      // Ensure correct source is set
+      docs.forEach((doc) => {
+        doc.metadata = { ...(doc.metadata || {}), source: fileName };
+      });
     } else if (
       fileType ===
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document"

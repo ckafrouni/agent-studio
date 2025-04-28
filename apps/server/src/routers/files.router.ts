@@ -168,8 +168,10 @@ export async function searchDocuments(query: string, k?: number) {
     const formattedResults = results.ids[0].map((id, index) => ({
       id,
       document: results.documents![0][index] ?? "",
-      metadata: results.metadatas![0][index] ?? {},
-      distance: results.distances![0][index] ?? null,
+      metadata: {
+        ...(results.metadatas![0][index] ?? {}),
+        distance: results.distances![0][index] ?? null,
+      },
     }));
 
     console.log(
