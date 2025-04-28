@@ -11,7 +11,7 @@ const app = new Hono();
 app.use(logger());
 app.use(cors());
 
-app.route("/api/workflows", workflowsRouter);
+app.route("/api/workflows", workflowsRouter); // Mount the workflows router at /api/workflows
 app.route("/api/files", filesRouter);
 app.route("/api", rootRouter);
 

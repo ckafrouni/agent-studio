@@ -5,6 +5,8 @@ export const env = createEnv({
   server: {
     // OpenAI
     OPENAI_API_KEY: z.string().min(1),
+    // Tavily (for Web Search RAG)
+    TAVILY_API_KEY: z.string().min(1),
     OPENAI_CHAT_MODEL: z.string().optional().default("gpt-4o"),
     OPENAI_EMBEDDING_MODEL: z.string().optional().default("text-embedding-3-small"),
     // ChromaDB

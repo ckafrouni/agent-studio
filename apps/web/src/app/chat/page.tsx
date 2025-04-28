@@ -11,10 +11,13 @@ import {
 } from "@/components/ui/accordion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 export default function Home() {
   const { turns, sendMessage } = useChatStream();
   const [input, setInput] = useState("");
+  const [selectedWorkflow, setSelectedWorkflow] = useState<'vector-rag' | 'web-search-rag'>('vector-rag');
   const turnsContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -86,6 +89,20 @@ export default function Home() {
         ))}
       </div>
 
+      {/* Workflow Toggle Switch */}
+      <div className="flex items-center space-x-2 mb-2 sticky bottom-[70px] bg-background py-2">
+        <Switch
+          id="workflow-toggle"
+          checked={selectedWorkflow === 'web-search-rag'}
+          onCheckedChange={(checked) => {
+            setSelectedWorkflow(checked ? 'web-search-rag' : 'vector-rag');
+          }}
+        />
+        <Label htmlFor="workflow-toggle">
+          Use Web Search Fallback (Current: {selectedWorkflow === 'web-search-rag' ? 'Web Search' : 'Vector Store Only'})
+        </Label>
+      </div>
+
       <form
         className="flex gap-2 sticky bottom-0 bg-background"
         onSubmit={async (e) => {
@@ -95,7 +112,7 @@ export default function Home() {
           if (!prompt) return;
 
           setInput("");
-          await sendMessage(prompt);
+          await sendMessage(prompt, selectedWorkflow);
         }}
       >
         <Input
@@ -106,7 +123,7 @@ export default function Home() {
           placeholder="Ask anything..."
           className="flex-1"
         />
-        <Button type="submit">Submit</Button>
+        <Button type="submit" disabled={!input.trim()}>Submit</Button> {/* Disable button if input is empty */}
       </form>
     </div>
   );
