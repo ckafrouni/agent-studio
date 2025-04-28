@@ -150,9 +150,6 @@ export async function deleteDocumentBySource(source: string) {
     await collection.delete({
       where: { source: validatedSource },
     });
-    console.log(
-      `[deleteDocumentBySource] Delete operation completed for source: ${validatedSource}.`
-    );
     return {
       success: true,
       message: `Documents associated with source '${validatedSource}' deleted successfully.`,

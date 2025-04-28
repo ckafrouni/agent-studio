@@ -73,10 +73,6 @@ export function useChatStream() {
 
           try {
             const parsedData = JSON.parse(line);
-            console.log(
-              "Received NDJSON update chunk:",
-              JSON.stringify(parsedData, null, 2)
-            );
 
             // Check if parsedData is the expected array structure
             if (!Array.isArray(parsedData) || parsedData.length !== 2) {

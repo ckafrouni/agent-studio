@@ -25,8 +25,6 @@ const AICitationResponse = ({
   content: string;
   documents?: Document[];
 }) => {
-  console.log("AICitationResponse rendered. Documents:", documents); // Log received documents
-
   if (!documents || documents.length === 0) {
     return <div>{content}</div>;
   }
@@ -42,11 +40,8 @@ const AICitationResponse = ({
         if (index % 2 === 0) {
           return <span key={index}>{part}</span>;
         } else {
-          console.log(`Processing citation part: ${part}`); // Log the raw part matched
           const docId = part;
-          console.log(`Looking for document with ID: '${docId}'`); // Log the extracted docId
           const document = documents.find((doc) => doc.metadata.id === docId);
-          console.log("Found document:", document); // Log the result of the find operation
 
           return (
             <Popover key={index}>

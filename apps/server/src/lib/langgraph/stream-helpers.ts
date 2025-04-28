@@ -20,7 +20,6 @@ export const streamMessages = async (
 
       for await (const chunk of messagesStream) {
         if (chunk) {
-          console.log("Streaming update chunk:", chunk);
           const ndjsonChunk = `${JSON.stringify(chunk)}\n`;
           await stream.write(ndjsonChunk);
         }

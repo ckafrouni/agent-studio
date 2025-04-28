@@ -4,15 +4,11 @@
   "scripts": {
     "dev": "turbo dev"
   },
-  "dependencies": {
-    "@radix-ui/react-alert-dialog": "^1.1.10",
-    "sonner": "^2.0.3"
-  },
+  "dependencies": {},
   "devDependencies": {
     "turbo": "^2.5.2"
   },
   "workspaces": [
-    "apps/*",
-    "packages/*"
+    "apps/*"
   ]
 }
