@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useQueryState } from "nuqs";
+import Link from "next/link";
 
 export default function Home() {
   const { turns, sendMessage } = useChatStream();
@@ -45,26 +46,33 @@ export default function Home() {
 
             {turn.steps.length > 0 && (
               <Accordion type="multiple" className="text-muted-foreground">
-                {turn.steps.map((step, stepIndex) => {
-                  const stepName = Object.values(step)[0] as string;
-                  const stepData = Object.values(step)[1] as string;
-                  return (
-                    <AccordionItem
-                      key={stepIndex}
-                      value={`turn-${index}-step-${stepIndex}`}
-                      className=""
-                    >
-                      <AccordionTrigger className="text-xs">
-                        Step {stepIndex + 1} - {stepName}
-                      </AccordionTrigger>
-                      <AccordionContent>
-                        <pre className="text-xs overflow-x-auto">
-                          {JSON.stringify(stepData, null, 2)}
-                        </pre>
-                      </AccordionContent>
-                    </AccordionItem>
-                  );
-                })}
+                {turn.steps
+                  .filter((step) => {
+                    const stepData = Object.values(step)[1] as string;
+                    return !(
+                      (stepData as { final_node?: boolean }).final_node ?? false
+                    );
+                  })
+                  .map((step, stepIndex) => {
+                    const stepName = Object.values(step)[0] as string;
+                    const stepData = Object.values(step)[1] as string;
+                    return (
+                      <AccordionItem
+                        key={stepIndex}
+                        value={`turn-${index}-step-${stepIndex}`}
+                        className=""
+                      >
+                        <AccordionTrigger className="hover:cursor-pointer text-xs">
+                          Step {stepIndex + 1} - {stepName}
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          <pre className="text-xs overflow-x-auto">
+                            {JSON.stringify(stepData, null, 2)}
+                          </pre>
+                        </AccordionContent>
+                      </AccordionItem>
+                    );
+                  })}
               </Accordion>
             )}
 
@@ -82,11 +90,36 @@ export default function Home() {
                           className="text-purple-400 hover:text-purple-600 px-0.5"
                         />
                       ),
+                      h1: ({ ...props }) => <h1 {...props} className="mb-4" />,
+                      h2: ({ ...props }) => <h2 {...props} className="mt-4" />,
                     }}
                   >
                     {turn.ai.content as string}
                   </ReactMarkdown>
                 </div>
+              </div>
+            )}
+
+            {turn.sourceDocuments && turn.sourceDocuments.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {turn.sourceDocuments.map((doc, docIndex) => (
+                  <Button
+                    variant={"outline"}
+                    key={docIndex}
+                    className=""
+                    asChild
+                  >
+                    <Link
+                      href={`/api/files/content/${encodeURIComponent(
+                        doc.metadata?.source ?? ""
+                      )}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {docIndex + 1}
+                    </Link>
+                  </Button>
+                ))}
               </div>
             )}
           </div>

@@ -4,7 +4,7 @@ import {
   AIMessage,
   AIMessageChunk,
 } from "@langchain/core/messages";
-import type { Turn, GraphUpdate, Document } from "@/types/chat";
+import type { Turn, Document, RetrieverOutput } from "@/types/chat";
 import { isAIMessageChunk } from "@/lib/utils";
 import { env } from "@/env";
 
@@ -89,7 +89,8 @@ export function useChatStream() {
               const [eventType, payload] = parsedData;
 
               if (eventType === "updates") {
-                const update = payload as GraphUpdate;
+                console.log("Updates received:", payload);
+                const update = payload as Record<string, unknown>;
                 // Update steps based on node updates in the payload
                 const nodeKeys = Object.keys(update);
                 if (nodeKeys.length > 0) {
@@ -97,6 +98,13 @@ export function useChatStream() {
                   const stepData = (update as Record<string, unknown>)[
                     stepName
                   ];
+                  let sourceDocuments: Document[] = [];
+                  if (update["retriever"]) {
+                    const retrieverOutput = update[
+                      "retriever"
+                    ] as RetrieverOutput;
+                    sourceDocuments = retrieverOutput.documents;
+                  }
                   setTurns((prevTurns) => {
                     const lastTurnIndex = prevTurns.length - 1;
                     if (lastTurnIndex < 0) return prevTurns;
@@ -108,6 +116,10 @@ export function useChatStream() {
                         steps: [
                           ...lastTurn.steps,
                           { name: stepName, data: stepData },
+                        ],
+                        sourceDocuments: [
+                          ...(lastTurn.sourceDocuments || []),
+                          ...(sourceDocuments || []),
                         ],
                       },
                     ];

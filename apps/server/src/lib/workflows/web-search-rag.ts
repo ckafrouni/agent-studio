@@ -49,6 +49,7 @@ export const GraphAnnotation = Annotation.Root({
   documents: Annotation<Document[]>,
   web_context: Annotation<TavilySearchResponse | null>,
   routing: Annotation<Routes>,
+  final_node: Annotation<boolean>,
 });
 
 export type GraphAnnotationType = typeof GraphAnnotation.State;
@@ -156,12 +157,7 @@ const generator = async (state: GraphAnnotationType) => {
     new SystemMessage(prompt),
   ]);
 
-  response.response_metadata = {
-    ...(response.response_metadata || {}),
-    source_documents: state.documents,
-  };
-
-  return { messages: response };
+  return { messages: response, final_node: true };
 };
 
 // MARK: - Web Search Node
@@ -221,7 +217,7 @@ const web_generator = async (state: GraphAnnotationType) => {
     new SystemMessage(prompt),
   ]);
 
-  return { messages: response };
+  return { messages: response, final_node: true };
 };
 
 // MARK: - Graph

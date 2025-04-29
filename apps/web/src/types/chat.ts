@@ -34,7 +34,7 @@ export interface GeneratorOutput {
 // Represents a generic update from the LangGraph stream
 // Represents a single update from a graph node
 // It should ideally have exactly one key, which is the node name.
-export type GraphUpdate = 
+export type GraphUpdate =
   | { retriever: RetrieverOutput }
   | { checker: CheckerOutput }
   | { generator: GeneratorOutput }
@@ -46,6 +46,7 @@ export interface Document {
   metadata: {
     id: string;
     distance?: number;
+    source?: string;
   };
 }
 

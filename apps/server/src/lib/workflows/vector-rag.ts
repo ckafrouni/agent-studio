@@ -32,6 +32,7 @@ export const GraphAnnotation = Annotation.Root({
   messages: Annotation<BaseMessage[]>,
   documents: Annotation<Document[]>,
   routing: Annotation<Routes>,
+  final_node: Annotation<boolean>,
 });
 
 export type GraphAnnotationType = typeof GraphAnnotation.State;
@@ -136,12 +137,7 @@ const generator = async (state: GraphAnnotationType) => {
     new SystemMessage(prompt),
   ]);
 
-  response.response_metadata = {
-    ...(response.response_metadata || {}),
-    source_documents: state.documents,
-  };
-
-  return { messages: response };
+  return { messages: response, final_node: true };
 };
 
 // MARK: - Fallback Response
@@ -168,7 +164,7 @@ const fallback_generator = async (state: GraphAnnotationType) => {
     new SystemMessage(prompt),
   ]);
 
-  return { messages: response };
+  return { messages: response, final_node: true };
 };
 
 // MARK: - Graph
