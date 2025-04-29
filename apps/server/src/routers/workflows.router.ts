@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import vectorRagWorkflow from "~/lib/workflows/vector-rag";
 import webSearchRagWorkflow from "~/lib/workflows/web-search-rag";
 
-import { streamMessages } from "~/lib/langgraph/stream-helpers";
+import { streamMessages } from "~/lib/utils/stream-helpers";
 import { HumanMessage } from "@langchain/core/messages";
 
 const router = new Hono();
@@ -20,7 +20,7 @@ router.post("/messages", async (c) => {
   const selectedWorkflow =
     workflowName === "web-search-rag"
       ? webSearchRagWorkflow
-      : vectorRagWorkflow; // Default to vector-rag
+      : vectorRagWorkflow;
 
   return streamMessages(selectedWorkflow, c, {
     messages: [
