@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Workflow } from "@/hooks/useChatStream";
 import { cn } from "@/lib/utils";
-import { Globe, Send } from "lucide-react";
+import { Send, LucideIcon } from "lucide-react";
 
 export const UserInput = ({
   input,
@@ -11,6 +11,7 @@ export const UserInput = ({
   selectedWorkflow,
   setSelectedWorkflow,
   className,
+  workflowOptions,
 }: {
   input: string;
   setInput: (input: string) => void;
@@ -18,26 +19,27 @@ export const UserInput = ({
   selectedWorkflow: string;
   setSelectedWorkflow: (workflow: string) => void;
   className?: string;
+  workflowOptions: { name: string; label: string; icon: LucideIcon }[];
 }) => {
   return (
     <div className={cn("bg-background pb-4 pt-2", className)}>
       <div className="flex gap-2">
-        <Button
-          variant="ghost"
-          className={`hover:cursor-pointer hover:bg-blue-500 hover:text-secondary ${
-            selectedWorkflow === "web-search-rag"
-              ? "bg-blue-400 text-secondary"
-              : ""
-          }`}
-          onClick={() =>
-            selectedWorkflow === "web-search-rag"
-              ? setSelectedWorkflow("vector-rag")
-              : setSelectedWorkflow("web-search-rag")
-          }
-          aria-label="Toggle Web Search Fallback"
-        >
-          <Globe className="h-4 w-4" />
-        </Button>
+        {workflowOptions.map((option) => (
+          <Button
+            key={option.name}
+            variant="ghost"
+            className={`hover:cursor-pointer hover:bg-blue-500 hover:text-secondary ${
+              selectedWorkflow === option.name
+                ? "bg-blue-400 text-secondary"
+                : ""
+            }`}
+            onClick={() => setSelectedWorkflow(option.name)}
+            aria-label="Toggle Web Search Fallback"
+          >
+            <option.icon className="h-4 w-4" />
+            <span className="sr-only">{option.label}</span>
+          </Button>
+        ))}
         <form
           className="flex gap-2 w-full"
           onSubmit={async (e) => {

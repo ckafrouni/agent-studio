@@ -8,6 +8,12 @@ import { MarkdownRenderer } from "./components/markdown-renderer";
 import { UserMessage } from "./components/user-message";
 import { UserInput } from "./components/user-input";
 import { ScrollButton } from "./components/scroll-button";
+import { DatabaseIcon, GlobeIcon } from "lucide-react";
+
+const workflowOptions = [
+  { name: "vector-rag", label: "Vector RAG", icon: DatabaseIcon },
+  { name: "web-search-rag", label: "Web Search", icon: GlobeIcon },
+];
 
 export default function Home() {
   const { turns, sendMessage } = useChatStream();
@@ -87,6 +93,7 @@ export default function Home() {
         sendMessage={sendMessage}
         selectedWorkflow={selectedWorkflow}
         setSelectedWorkflow={setSelectedWorkflow}
+        workflowOptions={workflowOptions}
       />
     </div>
   );
