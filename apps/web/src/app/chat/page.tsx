@@ -7,6 +7,7 @@ import { SourcesBlocks } from "./components/sources-blocks";
 import { MarkdownRenderer } from "./components/markdown-renderer";
 import { UserMessage } from "./components/user-message";
 import { UserInput } from "./components/user-input";
+import { ScrollButton } from "./components/scroll-button";
 
 export default function Home() {
   const { turns, sendMessage } = useChatStream();
@@ -15,26 +16,53 @@ export default function Home() {
     defaultValue: "vector-rag",
   });
   const turnsContainerRef = useRef<HTMLDivElement>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
+  const [isAutoScrollEnabled, setIsAutoScrollEnabled] = useState(true);
 
   useEffect(() => {
-    if (turnsContainerRef.current) {
-      turnsContainerRef.current.scrollTop =
-        turnsContainerRef.current.scrollHeight;
+    if (isAutoScrollEnabled) {
+      bottomRef.current?.scrollIntoView();
     }
-  }, [turns]);
+  }, [turns, isAutoScrollEnabled]);
+
+  useEffect(() => {
+    const container = turnsContainerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = container;
+      const isAtBottom = scrollHeight - scrollTop - clientHeight < 5;
+
+      if (!isAtBottom && isAutoScrollEnabled) {
+        setIsAutoScrollEnabled(false);
+      } else if (isAtBottom && !isAutoScrollEnabled) {
+        setIsAutoScrollEnabled(true);
+      }
+    };
+
+    container.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      container.removeEventListener("scroll", handleScroll);
+    };
+  }, [isAutoScrollEnabled]);
+
+  const handleScrollDownClick = () => {
+    setIsAutoScrollEnabled(true);
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   return (
-    <div className="container mx-auto flex flex-col pt-16">
+    <div className="relative flex flex-col h-screen">
+      <div className="pt-16 flex-shrink-0"></div>
+
       <div
         id="turns-container"
         ref={turnsContainerRef}
-        className="flex-1 overflow-y-auto space-y-4"
+        className="flex-1 overflow-y-auto pb-60 container mx-auto px-4"
       >
         {turns.map((turn, index) => (
-          <div
-            key={index}
-            className={`mb-16 ${index === turns.length - 1 ? "mb-48" : ""}`}
-          >
+          <div key={index} className={`mb-16`}>
             <UserMessage content={turn.user.content as string} />
             <WorkflowSteps steps={turn.steps} />
             <MarkdownRenderer
@@ -44,10 +72,16 @@ export default function Home() {
             <SourcesBlocks sourceDocuments={turn.sourceDocuments ?? []} />
           </div>
         ))}
+        <div ref={bottomRef} />
       </div>
 
+      <ScrollButton
+        isAutoScrollEnabled={isAutoScrollEnabled}
+        handleScrollDownClick={handleScrollDownClick}
+      />
+
       <UserInput
-        className="fixed bottom-0 container"
+        className="fixed bottom-0 left-0 right-0 container mx-auto px-4 py-3"
         input={input}
         setInput={setInput}
         sendMessage={sendMessage}
