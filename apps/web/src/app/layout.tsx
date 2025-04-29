@@ -1,28 +1,28 @@
-import type { Metadata } from "next";
-import "./globals.css";
-import { NavBar } from "@/components/layout/navbar/NavBar";
-import { Toaster } from "@/components/ui/sonner";
-import { NuqsAdapter } from "nuqs/adapters/next/app";
+import type { Metadata } from 'next'
+import './globals.css'
+import { NavBar } from '@/components/layout/navbar/NavBar'
+import { Toaster } from '@/components/ui/sonner'
+import { NuqsAdapter } from 'nuqs/adapters/next/app'
 
 export const metadata: Metadata = {
-  title: "My RAG App",
-  description: "Chat with your documents",
-};
+	title: 'My RAG App',
+	description: 'Chat with your documents',
+}
 
 export default function RootLayout({
-  children,
+	children,
 }: Readonly<{
-  children: React.ReactNode;
+	children: React.ReactNode
 }>) {
-  return (
-    <html lang="en">
-      <body className="antialiased">
-        <NuqsAdapter>
-          <NavBar />
-          <main className="">{children}</main>
-          <Toaster position="bottom-right" />
-        </NuqsAdapter>
-      </body>
-    </html>
-  );
+	return (
+		<html lang="en">
+			<body className="antialiased">
+				<NuqsAdapter>
+					<NavBar />
+					<main className="">{children}</main>
+					<Toaster position="bottom-right" />
+				</NuqsAdapter>
+			</body>
+		</html>
+	)
 }

@@ -1,0 +1,11 @@
+# Ignore artifacts
+build
+coverage
+node_modules
+*lock
+.env.*
+venv
+.venv
+__pycache__
+.next
+.turbo

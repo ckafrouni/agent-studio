@@ -1,14 +1,30 @@
 {
-  "name": "langgraph-demo",
-  "packageManager": "bun@1.2.2",
-  "scripts": {
-    "dev": "turbo dev"
-  },
-  "dependencies": {},
-  "devDependencies": {
-    "turbo": "^2.5.2"
-  },
-  "workspaces": [
-    "apps/*"
-  ]
+	"name": "agentic-monorepo",
+	"private": true,
+	"workspaces": [
+		"apps/*"
+	],
+	"scripts": {
+		"dev": "turbo dev",
+		"build": "turbo build",
+		"dev:web": "turbo -F web dev",
+		"dev:server": "turbo -F server dev",
+		"db:push": "turbo -F server db:push",
+		"db:studio": "turbo -F server db:studio",
+		"lint": "turbo lint",
+		"format": "prettier . --write",
+		"prepare": "husky"
+	},
+	"lint-staged": {
+		"**/*": "prettier --write --ignore-unknown"
+	},
+	"dependencies": {},
+	"devDependencies": {
+		"husky": "^9.1.7",
+		"lint-staged": "^15.5.1",
+		"prettier": "3.5.3",
+		"prettier-plugin-tailwindcss": "^0.6.11",
+		"turbo": "^2.5.2"
+	},
+	"packageManager": "bun@1.2.2"
 }
