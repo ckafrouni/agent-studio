@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
-import { fileStorageService } from '~/lib/services/file-storage.service'
-import { documentService } from '~/lib/services/document.service'
-import { fileManagementService } from '~/lib/services/file-management.service'
+import { fileStorageService } from '@/lib/services/file-storage.service'
+import { documentService } from '@/lib/services/document.service'
+import { fileManagementService } from '@/lib/services/file-management.service'
 import { NoSuchKey } from '@aws-sdk/client-s3'
 
 const filesRouter = new Hono()

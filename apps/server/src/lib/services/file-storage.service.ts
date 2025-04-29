@@ -1,4 +1,4 @@
-import { s3Client, bucketName } from '~/lib/s3/client'
+import { s3Client, bucketName } from '@/lib/s3/client'
 import {
 	GetObjectCommand,
 	DeleteObjectCommand,

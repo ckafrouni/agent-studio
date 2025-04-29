@@ -7,6 +7,10 @@ import { env } from '@/env'
 import { FileUploadCard } from './components/FileUploadCard'
 import { SearchCard } from './components/SearchCard'
 import { DocumentListCard } from './components/DocumentListCard'
+import { trpc } from '@/utils/trpc'
+import { useQuery } from '@tanstack/react-query'
+import { authClient } from '@/lib/auth-client'
+import { redirect } from 'next/navigation'
 
 interface DocumentInfo {
 	id: string
@@ -16,6 +20,13 @@ interface DocumentInfo {
 }
 
 export default function AdminPage() {
+	const { data: session } = authClient.useSession()
+	useEffect(() => {
+		if (!session) {
+			redirect('/login')
+		}
+	}, [session])
+
 	const [documentList, setDocumentList] = useState<DocumentInfo[]>([])
 	const [isLoadingList, setIsLoadingList] = useState(true)
 	const [errorList, setErrorList] = useState<string | null>(null)
@@ -79,8 +90,26 @@ export default function AdminPage() {
 		}
 	}
 
+	const healthCheck = useQuery(trpc.healthCheck.queryOptions())
+
 	return (
 		<div className="container mx-auto grid max-w-4xl grid-cols-1 gap-6 pt-24">
+			<section className="rounded-lg border p-4">
+				<h2 className="mb-2 font-medium">API Status</h2>
+				<div className="flex items-center gap-2">
+					<div
+						className={`h-2 w-2 rounded-full ${healthCheck.data ? 'bg-green-500' : 'bg-red-500'}`}
+					/>
+					<span className="text-muted-foreground text-sm">
+						{healthCheck.isLoading
+							? 'Checking...'
+							: healthCheck.data
+								? 'Connected'
+								: 'Disconnected'}
+					</span>
+				</div>
+			</section>
+
 			<FileUploadCard onUploadSuccess={fetchDocumentList} />
 
 			<SearchCard />

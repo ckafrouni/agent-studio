@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { NavLink } from './NavLink'
+import UserMenu from './user-menu'
 
 export function NavBar() {
 	return (
@@ -11,6 +12,7 @@ export function NavBar() {
 				<div className="space-x-2">
 					<NavLink href="/chat" label="Chat" />
 					<NavLink href="/admin" label="Admin" />
+					<UserMenu />
 				</div>
 			</nav>
 		</div>

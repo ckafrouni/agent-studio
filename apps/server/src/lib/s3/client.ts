@@ -1,5 +1,5 @@
 import { S3Client } from '@aws-sdk/client-s3'
-import { env } from '~/env'
+import { env } from '@/env'
 
 // Ensure required environment variables are set
 if (!env.S3_BUCKET_NAME) {

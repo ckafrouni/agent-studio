@@ -1,8 +1,8 @@
 import { Hono } from 'hono'
-import vectorRagWorkflow from '~/lib/workflows/vector-rag'
-import webSearchRagWorkflow from '~/lib/workflows/web-search-rag'
+import vectorRagWorkflow from '@/lib/workflows/vector-rag'
+import webSearchRagWorkflow from '@/lib/workflows/web-search-rag'
 
-import { streamMessages } from '~/lib/utils/stream-helpers'
+import { streamMessages } from '@/lib/utils/stream-helpers'
 import { HumanMessage } from '@langchain/core/messages'
 
 const router = new Hono()

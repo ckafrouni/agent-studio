@@ -1,4 +1,4 @@
-import { collection } from '~/lib/vector-database/chroma'
+import { collection } from '@/lib/vector-database/chroma'
 import { IncludeEnum } from 'chromadb'
 import { z } from 'zod'
 import { PDFLoader } from '@langchain/community/document_loaders/fs/pdf'
@@ -6,7 +6,7 @@ import { TextLoader } from 'langchain/document_loaders/fs/text'
 import mammoth from 'mammoth'
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter'
 import { Document } from '@langchain/core/documents'
-import { env } from '~/env'
+import { env } from '@/env'
 
 const SearchSchema = z.object({
 	query: z.string().min(1, 'Search query cannot be empty.'),

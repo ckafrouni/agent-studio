@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 import { NavBar } from '@/components/layout/navbar/NavBar'
 import { Toaster } from '@/components/ui/sonner'
-import { NuqsAdapter } from 'nuqs/adapters/next/app'
+import Providers from './providers'
 
 export const metadata: Metadata = {
 	title: 'My RAG App',
@@ -17,11 +17,11 @@ export default function RootLayout({
 	return (
 		<html lang="en">
 			<body className="antialiased">
-				<NuqsAdapter>
+				<Providers>
 					<NavBar />
 					<main className="">{children}</main>
 					<Toaster position="bottom-right" />
-				</NuqsAdapter>
+				</Providers>
 			</body>
 		</html>
 	)

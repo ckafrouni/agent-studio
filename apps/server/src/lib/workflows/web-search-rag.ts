@@ -1,10 +1,10 @@
-import { env } from '~/env'
+import { env } from '@/env'
 import { ChatOpenAI } from '@langchain/openai'
 import { StateGraph, START, END, Annotation } from '@langchain/langgraph'
 import { BaseMessage, SystemMessage } from '@langchain/core/messages'
 import { PromptTemplate } from '@langchain/core/prompts'
 import { DocumentInterface } from '@langchain/core/documents'
-import { collection } from '~/lib/vector-database/chroma'
+import { collection } from '@/lib/vector-database/chroma'
 import { ChromaNotFoundError } from 'chromadb'
 import { TavilySearch, TavilySearchResponse } from '@langchain/tavily'
 

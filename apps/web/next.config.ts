@@ -14,10 +14,18 @@ const nextConfig: NextConfig = {
 	async rewrites() {
 		return [
 			{
-				source: '/api/:path*', // Match any request starting with /api/
-				destination: 'http://localhost:3030/api/:path*', // Proxy it to the backend server on port 3030
+				source: '/api/:path*',
+				destination: 'http://localhost:3030/api/:path*',
 			},
 		]
+	},
+	images: {
+		remotePatterns: [
+			{
+				protocol: 'https',
+				hostname: 'lh3.googleusercontent.com',
+			},
+		],
 	},
 }
 
