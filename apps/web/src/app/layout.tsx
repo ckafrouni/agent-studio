@@ -20,7 +20,7 @@ export default function RootLayout({
         <NuqsAdapter>
           <NavBar />
           <main className="">{children}</main>
-          <Toaster position="bottom-left" />
+          <Toaster position="bottom-right" />
         </NuqsAdapter>
       </body>
     </html>
