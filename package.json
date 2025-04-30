@@ -1,5 +1,5 @@
 {
-	"name": "agentic-monorepo",
+	"name": "agent-studio",
 	"private": true,
 	"workspaces": [
 		"apps/*"

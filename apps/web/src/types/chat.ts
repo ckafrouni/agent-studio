@@ -2,7 +2,7 @@ import { HumanMessage, AIMessage, AIMessageChunk } from '@langchain/core/message
 import type {
 	Document as ServerDocument,
 	Routes as ServerRoutes,
-} from '@server/lib/workflows/vector-rag.ts'
+} from '@agent-studio/server/lib/workflows/vector-rag.ts'
 
 export interface ParsedAIMessageChunk {
 	type: string

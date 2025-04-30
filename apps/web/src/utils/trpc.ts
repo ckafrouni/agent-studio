@@ -2,7 +2,7 @@ import { QueryCache, QueryClient } from '@tanstack/react-query'
 import { createTRPCClient, httpBatchLink } from '@trpc/client'
 import { createTRPCOptionsProxy } from '@trpc/tanstack-react-query'
 import { toast } from 'sonner'
-import type { AppRouter } from '@server'
+import type { AppRouter } from '@agent-studio/server'
 import { env } from '@/env'
 
 export const queryClient = new QueryClient({

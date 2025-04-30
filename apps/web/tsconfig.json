@@ -20,8 +20,8 @@
 		],
 		"paths": {
 			"@/*": ["./src/*"],
-			"@server/*": ["../server/src/*"],
-			"@server": ["../server/src"]
+			"@agent-studio/server/*": ["../server/src/*"],
+			"@agent-studio/server": ["../server/src"]
 		}
 	},
 	"include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
