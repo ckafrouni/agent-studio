@@ -63,35 +63,25 @@ const doc_retriever = async (state: GraphAnnotationType) => {
 	const query = state.messages[state.messages.length - 1].content as string
 	let documents: any[] = []
 
-	try {
-		const results = await collection.query({
-			nResults: 5,
-			queryTexts: [query],
-		})
+	const results = await collection.query({
+		nResults: 5,
+		queryTexts: [query],
+	})
 
-		if (results && results.documents && results.documents.length > 0 && results.documents[0]) {
-			documents = results.documents[0]
-				.map((doc, i) => ({
-					pageContent: doc,
-					metadata: {
-						id: results.ids?.[0]?.[i],
-						distance: results.distances?.[0]?.[i] ?? 1,
-						source: results.metadatas?.[0]?.[i]?.source,
-					},
-				}))
-				.filter((doc) => {
-					const distance = doc.metadata.distance
-					return distance !== null && distance < 0.8
-				})
-		} else {
-			console.warn('Chroma query returned no documents or unexpected structure.')
-		}
-	} catch (error: any) {
-		if (error instanceof ChromaNotFoundError) {
-			console.warn('Collection not found or empty during query, returning no documents.')
-		} else {
-			console.error('Error during document retrieval query:', error)
-		}
+	if (results && results.documents && results.documents.length > 0 && results.documents[0]) {
+		documents = results.documents[0]
+			.map((doc, i) => ({
+				pageContent: doc,
+				metadata: {
+					id: results.ids?.[0]?.[i],
+					distance: results.distances?.[0]?.[i] ?? 1,
+					source: results.metadatas?.[0]?.[i]?.source,
+				},
+			}))
+			.filter((doc) => {
+				const distance = doc.metadata.distance
+				return distance !== null && distance < 0.8
+			})
 	}
 
 	return { documents }
@@ -152,12 +142,9 @@ const web_searcher = async (state: GraphAnnotationType) => {
 	})
 	const web_context = await tool.invoke({ query: question })
 
-	if (!web_context) {
-		console.warn('Tavily search returned no results.')
-		return { web_context: 'No relevant information found after web search.' }
-	}
-
-	return { web_context }
+	return !web_context
+		? { web_context: 'No relevant information found after web search.' }
+		: { web_context }
 }
 
 // MARK: - Generate Response with Web Context

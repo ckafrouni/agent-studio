@@ -11,7 +11,7 @@
       },
     },
     "apps/server": {
-      "name": "server",
+      "name": "@agent-studio/server",
       "dependencies": {
         "@aws-sdk/client-s3": "^3.797.0",
         "@hono/trpc-server": "^0.3.4",
@@ -48,7 +48,7 @@
       },
     },
     "apps/web": {
-      "name": "web",
+      "name": "@agent-studio/web",
       "version": "0.1.0",
       "dependencies": {
         "@hookform/resolvers": "^3.10.0",
@@ -100,6 +100,10 @@
     },
   },
   "packages": {
+    "@agent-studio/server": ["@agent-studio/server@workspace:apps/server"],
+
+    "@agent-studio/web": ["@agent-studio/web@workspace:apps/web"],
+
     "@alloc/quick-lru": ["@alloc/quick-lru@5.2.0", "", {}, "sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw=="],
 
     "@anthropic-ai/sdk": ["@anthropic-ai/sdk@0.37.0", "", { "dependencies": { "@types/node": "^18.11.18", "@types/node-fetch": "^2.6.4", "abort-controller": "^3.0.0", "agentkeepalive": "^4.2.1", "form-data-encoder": "1.7.2", "formdata-node": "^4.3.2", "node-fetch": "^2.6.7" } }, "sha512-tHjX2YbkUBwEgg0JZU3EFSSAQPoK4qQR/NFYa8Vtzd5UAyXzZksCw2In69Rml4R/TyHPBfRYaLK35XiOe33pjw=="],
@@ -1808,8 +1812,6 @@
 
     "semver": ["semver@7.7.1", "", { "bin": { "semver": "bin/semver.js" } }, "sha512-hlq8tAfn0m/61p4BVRcPzIGr6LKiMwo4VM6dGi6pt4qcRkmNzTcWq6eCEjEh+qXjkMDvPlOFFSGwQjoEa6gyMA=="],
 
-    "server": ["server@workspace:apps/server"],
-
     "set-cookie-parser": ["set-cookie-parser@2.7.1", "", {}, "sha512-IOc8uWeOZgnb3ptbCURJWNjWUPcO3ZnTTdzsurqERrP6nPyv+paC55vJM0LpOlT2ne+Ix+9+CRG1MNLlyZ4GjQ=="],
 
     "set-function-length": ["set-function-length@1.2.2", "", { "dependencies": { "define-data-property": "^1.1.4", "es-errors": "^1.3.0", "function-bind": "^1.1.2", "get-intrinsic": "^1.2.4", "gopd": "^1.0.1", "has-property-descriptors": "^1.0.2" } }, "sha512-pgRc4hJ4/sNjWCSS9AmnS40x3bNMDTknHgL5UaMBTMyJnU90EgWh1Rz+MC9eFu4BuN/UwZjKQuY/1v3rM7HMfg=="],
@@ -2021,8 +2023,6 @@
     "vfile-message": ["vfile-message@4.0.2", "", { "dependencies": { "@types/unist": "^3.0.0", "unist-util-stringify-position": "^4.0.0" } }, "sha512-jRDZ1IMLttGj41KcZvlrYAaI3CfqpLpfpf+Mfig13viT6NKvRzWZ+lXz0Y5D60w6uJIBAOGq9mSHf0gktF0duw=="],
 
     "voyageai": ["voyageai@0.0.3", "", { "dependencies": { "form-data": "^4.0.0", "formdata-node": "^6.0.3", "js-base64": "3.7.2", "node-fetch": "2.7.0", "qs": "6.11.2", "readable-stream": "^4.5.2", "url-join": "4.0.1" } }, "sha512-qVXZvULgpa4bXTHH1dbNz+u8IQI239+yP6NeafeSMwaQbE0QsiU9OSpBEtGlighguoVshbdTUWh6VcYr2vUacg=="],
-
-    "web": ["web@workspace:apps/web"],
 
     "web-streams-polyfill": ["web-streams-polyfill@4.0.0-beta.3", "", {}, "sha512-QW95TCTaHmsYfHDybGMwO5IJIM93I/6vTRk+daHTWFPhwh+C8Cg7j7XyKrwrj8Ib6vYXe0ocYNrmzY4xAAN6ug=="],
 

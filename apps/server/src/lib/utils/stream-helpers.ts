@@ -1,4 +1,4 @@
-import { Context } from 'hono'
+import type { Context } from 'hono'
 import { stream } from 'hono/streaming'
 import type { BaseMessage } from '@langchain/core/messages'
 import type { IterableReadableStream } from '@langchain/core/utils/stream'
@@ -31,7 +31,6 @@ export const streamMessages = async (
 			}
 		})
 	} catch (error) {
-		console.error('Error:', error)
 		c.res = c.json({ error: 'Failed to process request' }, 500)
 	}
 }

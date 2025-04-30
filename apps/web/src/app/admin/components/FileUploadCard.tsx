@@ -54,7 +54,6 @@ export function FileUploadCard({ onUploadSuccess }: FileUploadCardProps) {
 					onUploadSuccess()
 				} catch (error) {
 					overallSuccess = false
-					console.error(`Upload failed for ${file.name}:`, error)
 					const errorMessage =
 						error instanceof Error ? error.message : `Upload failed for ${file.name}.`
 					toast.error(errorMessage)

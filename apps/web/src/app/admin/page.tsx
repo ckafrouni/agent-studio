@@ -46,7 +46,6 @@ export default function AdminPage() {
 			const data = await response.json()
 			setDocumentList(data.documents ?? [])
 		} catch (error) {
-			console.error('Failed to fetch documents:', error)
 			setErrorList(error instanceof Error ? error.message : 'Failed to load documents.')
 			setDocumentList([])
 		} finally {
@@ -78,7 +77,6 @@ export default function AdminPage() {
 			toast.success(result.message || `Successfully deleted ${docToDelete.metadata.source}.`)
 			fetchDocumentList()
 		} catch (error) {
-			console.error('Delete failed:', error)
 			const errorMessage = error instanceof Error ? error.message : 'File deletion failed.'
 			toast.error(errorMessage)
 		} finally {

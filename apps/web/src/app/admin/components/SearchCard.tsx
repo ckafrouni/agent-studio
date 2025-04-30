@@ -55,7 +55,6 @@ export function SearchCard() {
 				toast.info('No results found for your query.')
 			}
 		} catch (error) {
-			console.error('Search failed:', error)
 			const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.'
 			toast.error(`Search failed: ${errorMessage}`)
 			setSearchError(errorMessage)

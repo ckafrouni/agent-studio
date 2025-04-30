@@ -68,7 +68,6 @@ class DocumentService {
 			}
 
 			if (!docs || docs.length === 0) {
-				console.warn(`No documents extracted from ${fileName}.`)
 				return {
 					fileName,
 					docCount: 0,
@@ -82,7 +81,6 @@ class DocumentService {
 			)
 
 			if (validChunks.length === 0) {
-				console.warn(`No valid text chunks found in ${fileName} after splitting.`)
 				return {
 					fileName,
 					docCount: docs.length,
@@ -121,10 +119,6 @@ class DocumentService {
 				chunksAdded: validChunks.length,
 			}
 		} catch (error) {
-			console.error(
-				`[DocumentService.addDocumentFromBuffer] Error processing file ${fileName}:`,
-				error,
-			)
 			const message = error instanceof Error ? error.message : 'File processing failed.'
 			throw new Error(`Failed to process file ${fileName}: ${message}`)
 		}
@@ -150,7 +144,6 @@ class DocumentService {
 
 			return { documents: Array.from(uniqueSources.values()) }
 		} catch (error) {
-			console.error('[DocumentService.listDocuments] Error:', error)
 			throw new Error('Failed to retrieve document list from vector store.')
 		}
 	}
@@ -195,7 +188,6 @@ class DocumentService {
 
 			return { results: formattedResults }
 		} catch (error) {
-			console.error('[DocumentService.searchDocuments] Error:', error)
 			throw new Error('Failed to search documents in vector store.')
 		}
 	}
@@ -214,10 +206,6 @@ class DocumentService {
 			const deleteResult = await collection.delete({
 				where: { source: validatedFilename },
 			})
-			console.log(
-				`[DocumentService.deleteVectorDataBySource] Deleted vectors for source filename: ${validatedFilename}`,
-				deleteResult,
-			)
 			const deletedCount = Array.isArray(deleteResult) ? deleteResult.length : undefined
 			return {
 				success: true,
@@ -225,10 +213,6 @@ class DocumentService {
 				deletedVectorCount: deletedCount,
 			}
 		} catch (error) {
-			console.error(
-				`[DocumentService.deleteVectorDataBySource] Error deleting vectors for source filename ${validatedFilename}:`,
-				error,
-			)
 			throw new Error(`Failed to delete vector data for source '${validatedFilename}'.`)
 		}
 	}
