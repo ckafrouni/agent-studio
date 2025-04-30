@@ -59,9 +59,7 @@ export default function Home() {
 	}
 
 	return (
-		<div className="relative flex h-screen flex-col">
-			<div className="flex-shrink-0 pt-16"></div>
-
+		<div className="flex flex-col pt-2">
 			<div
 				id="turns-container"
 				ref={turnsContainerRef}
@@ -84,7 +82,7 @@ export default function Home() {
 			/>
 
 			<UserInput
-				className="fixed right-0 bottom-0 left-0 container mx-auto px-4 py-3"
+				className="fixed bottom-0 container"
 				input={input}
 				setInput={setInput}
 				sendMessage={sendMessage}
