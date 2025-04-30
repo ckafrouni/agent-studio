@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useEffect } from 'react'
 import { toast } from 'sonner'
-import { env } from '@/env'
+import { apiFetch } from '@/lib/utils'
 
 import { FileUploadCard } from './components/FileUploadCard'
 import { SearchCard } from './components/SearchCard'
@@ -38,7 +38,8 @@ export default function AdminPage() {
 		setIsLoadingList(true)
 		setErrorList(null)
 		try {
-			const response = await fetch(`${env.NEXT_PUBLIC_SERVER_URL}/api/files`)
+			const response = await apiFetch('/api/files')
+
 			if (!response.ok) {
 				throw new Error(`HTTP error! status: ${response.status}`)
 			}
@@ -61,10 +62,8 @@ export default function AdminPage() {
 		setIsDeleting(true)
 		setDeletingDocId(docToDelete.id)
 		try {
-			const response = await fetch(
-				`${env.NEXT_PUBLIC_SERVER_URL}/api/files/${encodeURIComponent(
-					docToDelete.metadata.source ?? '',
-				)}`,
+			const response = await apiFetch(
+				`/api/files/${encodeURIComponent(docToDelete.metadata.source ?? '')}`,
 				{
 					method: 'DELETE',
 				},
