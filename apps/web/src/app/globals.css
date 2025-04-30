@@ -111,11 +111,55 @@
 	--sidebar-ring: oklch(0.556 0 0);
 }
 
+/* Keyframes for animations */
+@keyframes accordion-down {
+	from {
+		height: 0;
+	}
+	to {
+		height: var(--radix-accordion-content-height);
+	}
+}
+
+@keyframes accordion-up {
+	from {
+		height: var(--radix-accordion-content-height);
+	}
+	to {
+		height: 0;
+	}
+}
+
 @layer base {
 	* {
 		@apply border-border outline-ring/50;
 	}
 	body {
 		@apply bg-background text-foreground;
+	}
+}
+
+@layer components {
+	/* Container configuration */
+	.container {
+		@apply mx-auto px-8;
+		max-width: 1400px;
+	}
+
+	/* Screen breakpoints for container */
+	@media (min-width: 1400px) {
+		.container {
+			max-width: 1400px;
+		}
+	}
+}
+
+@layer utilities {
+	/* Animation utilities */
+	.animate-accordion-down {
+		animation: accordion-down 0.2s ease-out;
+	}
+	.animate-accordion-up {
+		animation: accordion-up 0.2s ease-out;
 	}
 }

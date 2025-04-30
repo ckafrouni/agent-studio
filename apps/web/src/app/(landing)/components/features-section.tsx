@@ -1,0 +1,73 @@
+import type React from 'react'
+import { Server, Key, Globe, Zap, Database, Code } from 'lucide-react'
+
+export function FeaturesSection() {
+	return (
+		<section id="features" className="bg-muted w-full py-12 md:py-24 lg:py-32">
+			<div className="container px-4 md:px-6">
+				<div className="flex flex-col items-center justify-center space-y-4 text-center">
+					<div className="space-y-2">
+						<div className="bg-primary text-primary-foreground inline-block rounded-lg px-3 py-1 text-sm">
+							Features
+						</div>
+						<h2 className="text-3xl font-bold tracking-tighter md:text-4xl">
+							Everything You Need for LangGraph Development
+						</h2>
+						<p className="text-muted-foreground max-w-[700px] md:text-xl">
+							Agent Studio provides a complete platform for developing, hosting, and testing your
+							LangGraph workflows.
+						</p>
+					</div>
+				</div>
+				<div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 py-12 md:grid-cols-2 lg:grid-cols-3">
+					<FeatureCard
+						icon={<Server className="text-primary h-6 w-6" />}
+						title="Full Hosting"
+						description="Deploy your LangGraph workflows with zero infrastructure management."
+					/>
+					<FeatureCard
+						icon={<Key className="text-primary h-6 w-6" />}
+						title="API Keys"
+						description="Generate API keys to easily integrate your workflows into any application."
+					/>
+					<FeatureCard
+						icon={<Globe className="text-primary h-6 w-6" />}
+						title="Compatible API"
+						description="Same outputs as LangGraph's server API for seamless integration."
+					/>
+					<FeatureCard
+						icon={<Zap className="text-primary h-6 w-6" />}
+						title="Instant Testing"
+						description="Test your workflows directly in the platform with real-time feedback."
+					/>
+					<FeatureCard
+						icon={<Database className="text-primary h-6 w-6" />}
+						title="Version Control"
+						description="Track changes and manage different versions of your workflows."
+					/>
+					<FeatureCard
+						icon={<Code className="text-primary h-6 w-6" />}
+						title="SDK Support"
+						description="Full support for @langchain/langgraph-sdk and @langchain/core."
+					/>
+				</div>
+			</div>
+		</section>
+	)
+}
+
+interface FeatureCardProps {
+	icon: React.ReactNode
+	title: string
+	description: string
+}
+
+function FeatureCard({ icon, title, description }: FeatureCardProps) {
+	return (
+		<div className="bg-background flex flex-col items-center space-y-2 rounded-lg border p-6 shadow-sm">
+			<div className="bg-primary/10 rounded-full p-3">{icon}</div>
+			<h3 className="text-xl font-bold">{title}</h3>
+			<p className="text-muted-foreground text-center">{description}</p>
+		</div>
+	)
+}

@@ -3,7 +3,7 @@ import { ChatOpenAI } from '@langchain/openai'
 import { StateGraph, START, END, Annotation } from '@langchain/langgraph'
 import { BaseMessage, SystemMessage } from '@langchain/core/messages'
 import { PromptTemplate } from '@langchain/core/prompts'
-import { DocumentInterface } from '@langchain/core/documents'
+import type { DocumentInterface } from '@langchain/core/documents'
 import { collection } from '@/lib/vector-database/chroma'
 import { ChromaNotFoundError } from 'chromadb'
 
