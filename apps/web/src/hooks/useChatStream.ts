@@ -10,7 +10,6 @@ export function useChatStream() {
 	const [turns, setTurns] = useState<Turn[]>([])
 
 	const sendMessage = useCallback(async (prompt: string, workflow: Workflow) => {
-		// Add user message immediately
 		setTurns((prevTurns) => [
 			...prevTurns,
 			{
@@ -33,7 +32,6 @@ export function useChatStream() {
 
 			if (!response.ok || !response.body) {
 				console.error('SSE request failed:', response.statusText)
-				// Optionally update the last turn with an error message
 				setTurns((prevTurns) => {
 					const lastTurnIndex = prevTurns.length - 1
 					if (lastTurnIndex < 0) return prevTurns
@@ -61,7 +59,7 @@ export function useChatStream() {
 
 				buffer += decoder.decode(value, { stream: true })
 				const lines = buffer.split('\n')
-				buffer = lines.pop() || '' // Keep incomplete line in buffer
+				buffer = lines.pop() || ''
 
 				for (const line of lines) {
 					if (line.trim() === '') continue
@@ -69,7 +67,6 @@ export function useChatStream() {
 					try {
 						const parsedData = JSON.parse(line)
 
-						// Check if parsedData is the expected array structure
 						if (!Array.isArray(parsedData) || parsedData.length !== 2) {
 							console.warn('Received unexpected NDJSON structure:', parsedData)
 							continue
@@ -78,9 +75,7 @@ export function useChatStream() {
 						const [eventType, payload] = parsedData
 
 						if (eventType === 'updates') {
-							console.log('Updates received:', payload)
 							const update = payload as Record<string, unknown>
-							// Update steps based on node updates in the payload
 							const nodeKeys = Object.keys(update)
 							if (nodeKeys.length > 0) {
 								const stepName = nodeKeys[0]
@@ -108,26 +103,21 @@ export function useChatStream() {
 								})
 							}
 						} else if (eventType === 'messages') {
-							// Payload for 'messages' is expected to be an array where the first element is the chunk
 							if (!Array.isArray(payload) || payload.length === 0) {
 								console.warn("Received unexpected payload structure for 'messages':", payload)
 								continue
 							}
-							const messageChunk = payload[0] // Get the actual message chunk object
+							const messageChunk = payload[0]
 
-							// Update AI message based on message chunk content
 							if (isAIMessageChunk(messageChunk)) {
 								let chunkContent = ''
-								// Check for properties of ParsedAIMessageChunk first
 								if (
 									'kwargs' in messageChunk &&
 									messageChunk.kwargs &&
 									typeof messageChunk.kwargs.content === 'string'
 								) {
 									chunkContent = messageChunk.kwargs.content
-								}
-								// Otherwise check for standard AIMessageChunk content
-								else if ('content' in messageChunk && typeof messageChunk.content === 'string') {
+								} else if ('content' in messageChunk && typeof messageChunk.content === 'string') {
 									chunkContent = messageChunk.content
 								}
 
@@ -140,7 +130,6 @@ export function useChatStream() {
 										const currentAIContent = (currentTurn.ai?.content as string) || ''
 										const updatedAIContent = currentAIContent + chunkContent
 
-										// Check for source documents in metadata
 										let sourceDocuments = currentTurn.sourceDocuments
 										const metadataChunk = messageChunk as AIMessageChunk
 										if (
@@ -156,16 +145,14 @@ export function useChatStream() {
 											...currentTurn,
 											ai: new AIMessage({
 												content: updatedAIContent,
-												// Preserve existing metadata if any, merge with new
 												response_metadata: {
 													...(currentTurn.ai?.response_metadata || {}),
 													...(metadataChunk.response_metadata || {}),
 												},
 											}),
-											sourceDocuments, // Update sourceDocuments
+											sourceDocuments,
 										}
 
-										// Return the full updated turns array
 										const updatedTurns = [...prevTurns]
 										updatedTurns[lastTurnIndex] = updatedTurn
 										return updatedTurns
@@ -187,7 +174,6 @@ export function useChatStream() {
 			}
 		} catch (error) {
 			console.error('Error fetching chat stream:', error)
-			// Optionally update UI to show a general error
 			setTurns((prevTurns) => {
 				const lastTurnIndex = prevTurns.length - 1
 				if (lastTurnIndex < 0) return prevTurns
@@ -196,12 +182,12 @@ export function useChatStream() {
 					...prevTurns.slice(0, -1),
 					{
 						...lastTurn,
-						ai: new AIMessage(`Error: Failed to connect or process stream.`), // More generic error
+						ai: new AIMessage(`Error: Failed to connect or process stream.`),
 					},
 				]
 			})
 		}
-	}, []) // Empty dependency array ensures sendMessage function identity is stable
+	}, [])
 
 	return { turns, sendMessage }
 }

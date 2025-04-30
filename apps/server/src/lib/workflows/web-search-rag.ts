@@ -3,10 +3,10 @@ import { ChatOpenAI } from '@langchain/openai'
 import { StateGraph, START, END, Annotation } from '@langchain/langgraph'
 import { BaseMessage, SystemMessage } from '@langchain/core/messages'
 import { PromptTemplate } from '@langchain/core/prompts'
-import { DocumentInterface } from '@langchain/core/documents'
+import { type DocumentInterface } from '@langchain/core/documents'
 import { collection } from '@/lib/vector-database/chroma'
 import { ChromaNotFoundError } from 'chromadb'
-import { TavilySearch, TavilySearchResponse } from '@langchain/tavily'
+import { TavilySearch, type TavilySearchResponse } from '@langchain/tavily'
 
 export interface Document extends DocumentInterface {
 	metadata: {
@@ -59,7 +59,6 @@ const model = new ChatOpenAI({
 })
 
 // MARK: - Retrieval Function
-// Tries to retrieve documents from ChromaDB based on the latest message.
 const doc_retriever = async (state: GraphAnnotationType) => {
 	const query = state.messages[state.messages.length - 1].content as string
 	let documents: any[] = []
@@ -99,15 +98,11 @@ const doc_retriever = async (state: GraphAnnotationType) => {
 }
 
 // MARK: - Document Check & Routing
-// Decides whether to use retrieved documents or proceed to web search.
 const rag_checker = async (state: GraphAnnotationType) => {
-	return state.documents.length > 0
-		? { routing: 'generator' } // Use retrieved docs if available
-		: { routing: 'web_searcher' } // Fallback to web search
+	return state.documents.length > 0 ? { routing: 'generator' } : { routing: 'web_searcher' }
 }
 
 // MARK: - Generate Response with RAG
-// Generates a response using the retrieved documents from ChromaDB.
 const generator = async (state: GraphAnnotationType) => {
 	const last_message = state.messages[state.messages.length - 1]
 	const question = last_message.content as string

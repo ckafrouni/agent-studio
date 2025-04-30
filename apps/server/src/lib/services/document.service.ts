@@ -28,20 +28,15 @@ const splitter = new RecursiveCharacterTextSplitter({
 	chunkOverlap: env.CHUNK_OVERLAP,
 })
 
-// Helper function to extract filename (S3 key)
 const extractFilename = (sourceUriOrFilename: string | undefined): string | undefined => {
 	if (!sourceUriOrFilename) return undefined
 	try {
-		// Handle full URIs like s3://bucket/filename.txt
 		if (sourceUriOrFilename.startsWith('s3://')) {
 			const parts = sourceUriOrFilename.split('/')
-			return parts[parts.length - 1] // Get last part
+			return parts[parts.length - 1]
 		}
-		// If not starting with s3://, assume it's already a filename
 		return sourceUriOrFilename
 	} catch (e) {
-		// If any error, return original (or handle differently)
-		console.warn(`[extractFilename] Could not parse source: ${sourceUriOrFilename}`, e)
 		return sourceUriOrFilename
 	}
 }
@@ -146,11 +141,9 @@ class DocumentService {
 			results.ids.forEach((id, index) => {
 				const metadata = results.metadatas?.[index]
 				const originalSource = metadata?.source as string | undefined
-				// UPDATE: Extract filename before adding to map
 				const filename = extractFilename(originalSource)
 
 				if (filename && !uniqueSources.has(filename)) {
-					// Store using filename as key and in metadata
 					uniqueSources.set(filename, { id, metadata: { source: filename } })
 				}
 			})

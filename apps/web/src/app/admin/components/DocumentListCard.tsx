@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 
-// Type definition from the original page
 interface DocumentInfo {
 	id: string
 	metadata: {
@@ -19,8 +18,8 @@ interface DocumentListCardProps {
 	isLoading: boolean
 	error: string | null
 	onDeleteClick: (doc: DocumentInfo) => void
-	isDeleting: boolean // Is *any* deletion in progress?
-	docBeingDeletedId: string | null // Which specific doc is being deleted?
+	isDeleting: boolean
+	docBeingDeletedId: string | null
 }
 
 export function DocumentListCard({

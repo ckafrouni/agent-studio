@@ -9,7 +9,6 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { env } from '@/env'
 import { toast } from 'sonner'
 
-// Type definition from the original page
 interface SearchResultItem {
 	id: string
 	document: string

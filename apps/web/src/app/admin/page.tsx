@@ -31,7 +31,6 @@ export default function AdminPage() {
 	const [isLoadingList, setIsLoadingList] = useState(true)
 	const [errorList, setErrorList] = useState<string | null>(null)
 
-	// We'll track which doc is actively being deleted for UI feedback
 	const [deletingDocId, setDeletingDocId] = useState<string | null>(null)
 	const [isDeleting, setIsDeleting] = useState(false)
 
@@ -58,10 +57,9 @@ export default function AdminPage() {
 		fetchDocumentList()
 	}, [fetchDocumentList])
 
-	// Renamed and modified to accept doc directly
 	const handleDeleteDocument = async (docToDelete: DocumentInfo) => {
 		setIsDeleting(true)
-		setDeletingDocId(docToDelete.id) // Track which doc is being deleted
+		setDeletingDocId(docToDelete.id)
 		try {
 			const response = await fetch(
 				`${env.NEXT_PUBLIC_SERVER_URL}/api/files/${encodeURIComponent(
@@ -79,14 +77,14 @@ export default function AdminPage() {
 			}
 
 			toast.success(result.message || `Successfully deleted ${docToDelete.metadata.source}.`)
-			fetchDocumentList() // Refresh list after delete
+			fetchDocumentList()
 		} catch (error) {
 			console.error('Delete failed:', error)
 			const errorMessage = error instanceof Error ? error.message : 'File deletion failed.'
 			toast.error(errorMessage)
 		} finally {
 			setIsDeleting(false)
-			setDeletingDocId(null) // Clear deleting state
+			setDeletingDocId(null)
 		}
 	}
 
@@ -118,9 +116,9 @@ export default function AdminPage() {
 				documents={documentList}
 				isLoading={isLoadingList}
 				error={errorList}
-				onDeleteClick={handleDeleteDocument} // Pass the direct delete handler
+				onDeleteClick={handleDeleteDocument}
 				isDeleting={isDeleting}
-				docBeingDeletedId={deletingDocId} // Pass the ID being deleted
+				docBeingDeletedId={deletingDocId}
 			/>
 		</div>
 	)

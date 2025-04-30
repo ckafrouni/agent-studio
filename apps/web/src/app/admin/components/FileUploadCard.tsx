@@ -9,7 +9,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { env } from '@/env'
 
 interface FileUploadCardProps {
-	onUploadSuccess: () => void // Callback to refresh list after successful upload
+	onUploadSuccess: () => void
 }
 
 export function FileUploadCard({ onUploadSuccess }: FileUploadCardProps) {
@@ -30,7 +30,6 @@ export function FileUploadCard({ onUploadSuccess }: FileUploadCardProps) {
 			let overallSuccess = true
 			let lastError = null
 
-			// Inform user that multiple uploads are starting
 			toast.info(`Starting upload for ${acceptedFiles.length} file(s)...`)
 
 			for (const file of acceptedFiles) {
@@ -38,9 +37,6 @@ export function FileUploadCard({ onUploadSuccess }: FileUploadCardProps) {
 				formData.append('file', file)
 
 				try {
-					// Optional: Show toast for each file starting
-					// toast.info(`Uploading ${file.name}...`);
-
 					const response = await fetch(`${env.NEXT_PUBLIC_SERVER_URL}/api/files/upload`, {
 						method: 'POST',
 						body: formData,
@@ -49,32 +45,27 @@ export function FileUploadCard({ onUploadSuccess }: FileUploadCardProps) {
 					const result = await response.json()
 
 					if (!response.ok) {
-						// Use specific message from backend if available
 						throw new Error(
 							result.message || `Upload failed for ${file.name} (Status: ${response.status})`,
 						)
 					}
 
-					// Success toast for each file
 					toast.success(result.message ?? `Successfully processed ${file.name}.`)
-					onUploadSuccess() // Refresh list after each successful upload
+					onUploadSuccess()
 				} catch (error) {
 					overallSuccess = false
 					console.error(`Upload failed for ${file.name}:`, error)
 					const errorMessage =
 						error instanceof Error ? error.message : `Upload failed for ${file.name}.`
-					toast.error(errorMessage) // Error toast for the specific file
-					lastError = errorMessage // Keep track of the last error message
+					toast.error(errorMessage)
+					lastError = errorMessage
 				}
-			} // End of loop
+			}
 
-			// After all uploads are attempted
 			setIsUploading(false)
 			if (!overallSuccess && lastError) {
-				// Optionally set a general error state if needed, using the last error
 				setUploadError(lastError)
 			} else if (overallSuccess) {
-				// Clear any previous error message if all were successful
 				setUploadError(null)
 			}
 		},

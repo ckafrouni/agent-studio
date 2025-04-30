@@ -13,7 +13,6 @@ import {
 	AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 
-// Type definition from the original page
 interface DocumentInfo {
 	id: string
 	metadata: {
