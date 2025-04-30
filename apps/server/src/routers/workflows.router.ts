@@ -1,11 +1,12 @@
 import { Hono } from 'hono'
+import type { HonoEnv } from '@/hono.types'
 import vectorRagWorkflow from '@/lib/workflows/vector-rag'
 import webSearchRagWorkflow from '@/lib/workflows/web-search-rag'
 
 import { streamMessages } from '@/lib/utils/stream-helpers'
 import { HumanMessage } from '@langchain/core/messages'
 
-const router = new Hono()
+const router = new Hono<HonoEnv>()
 
 router.post('/messages', async (c) => {
 	const { prompt, workflow: workflowName = 'vector-rag' } = await c.req.json<{

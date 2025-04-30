@@ -3,8 +3,9 @@ import { fileStorageService } from '@/lib/services/file-storage.service'
 import { documentService } from '@/lib/services/document.service'
 import { fileManagementService } from '@/lib/services/file-management.service'
 import { NoSuchKey } from '@aws-sdk/client-s3'
+import type { HonoEnv } from '@/hono.types'
 
-const filesRouter = new Hono()
+const filesRouter = new Hono<HonoEnv>()
 	.post('/upload', async (c) => {
 		try {
 			const formData = await c.req.formData()
@@ -36,6 +37,11 @@ const filesRouter = new Hono()
 	})
 
 	.get('/', async (c) => {
+		const session = c.get('session')
+		if (!session) {
+			return c.json({ error: 'Unauthorized' }, 401)
+		}
+
 		try {
 			const result = await documentService.listDocuments()
 			return c.json(result)

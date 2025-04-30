@@ -20,12 +20,12 @@ interface DocumentInfo {
 }
 
 export default function AdminPage() {
-	const { data: session } = authClient.useSession()
+	const { data: session, isPending } = authClient.useSession()
 	useEffect(() => {
-		if (!session) {
+		if (!isPending && !session) {
 			redirect('/login')
 		}
-	}, [session])
+	}, [session, isPending])
 
 	const [documentList, setDocumentList] = useState<DocumentInfo[]>([])
 	const [isLoadingList, setIsLoadingList] = useState(true)
