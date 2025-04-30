@@ -7,7 +7,7 @@ import { authClient } from '@/lib/auth-client'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 
-const CALLBACK_URL = 'http://localhost:3000/playground'
+const CALLBACK_URL = 'http://localhost:3000/studio/dashboard'
 
 export default function SignIn() {
 	const router = useRouter()
