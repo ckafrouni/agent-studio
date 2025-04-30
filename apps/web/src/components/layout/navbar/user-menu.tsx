@@ -13,6 +13,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
+import { User } from 'lucide-react'
 
 export default function UserMenu() {
 	const router = useRouter()
@@ -33,13 +34,19 @@ export default function UserMenu() {
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
-				<Image
-					src={session.user.image || ''}
-					alt={session.user.name}
-					width={40}
-					height={40}
-					className="inline h-8 w-8 rounded-full"
-				/>
+				{session.user.image ? (
+					<Image
+						src={session.user.image}
+						alt={session.user.name}
+						width={40}
+						height={40}
+						className="inline h-8 w-8 rounded-full"
+					/>
+				) : (
+					<span className="bg-accent inline rounded-full p-2">
+						<User className="inline" />
+					</span>
+				)}
 			</DropdownMenuTrigger>
 			<DropdownMenuContent className="bg-card">
 				<DropdownMenuLabel>My Account</DropdownMenuLabel>
