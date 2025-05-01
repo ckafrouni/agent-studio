@@ -34,7 +34,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 			<SidebarInset>
 				<SiteHeader title="Dashboard" />
 				<div className="flex flex-1 flex-col">
-					<div className="@container/main flex flex-1 flex-col gap-2">{children}</div>
+					<div className="@container/main relative flex flex-1 flex-col gap-2 overflow-clip">
+						{children}
+					</div>
 				</div>
 			</SidebarInset>
 		</SidebarProvider>

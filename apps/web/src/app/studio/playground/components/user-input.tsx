@@ -22,7 +22,7 @@ export const UserInput = ({
 	workflowOptions: { name: string; label: string; icon: LucideIcon }[]
 }) => {
 	return (
-		<div className={cn('bg-background pt-2 pb-6', className)}>
+		<div className={cn('bg-background p-2', className)}>
 			<div className="flex gap-2">
 				{workflowOptions.map((option) => (
 					<Button

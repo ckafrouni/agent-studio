@@ -59,11 +59,11 @@ export default function Home() {
 	}
 
 	return (
-		<div className="flex flex-col pt-2">
+		<div className="flex h-full flex-col">
 			<div
 				id="turns-container"
 				ref={turnsContainerRef}
-				className="container mx-auto flex-1 overflow-y-auto px-4 pb-60"
+				className="container mx-auto flex-1 overflow-y-auto px-4"
 			>
 				{turns.map((turn, index) => (
 					<div key={index} className={`mb-16`}>
@@ -81,15 +81,17 @@ export default function Home() {
 				handleScrollDownClick={handleScrollDownClick}
 			/>
 
-			<UserInput
-				className="fixed bottom-0 container"
-				input={input}
-				setInput={setInput}
-				sendMessage={sendMessage}
-				selectedWorkflow={selectedWorkflow}
-				setSelectedWorkflow={setSelectedWorkflow}
-				workflowOptions={workflowOptions}
-			/>
+			{/* Sticky container for the user input */}
+			<div className="bg-background sticky bottom-0 w-full px-4 py-4">
+				<UserInput
+					input={input}
+					setInput={setInput}
+					sendMessage={sendMessage}
+					selectedWorkflow={selectedWorkflow}
+					setSelectedWorkflow={setSelectedWorkflow}
+					workflowOptions={workflowOptions}
+				/>
+			</div>
 		</div>
 	)
 }
