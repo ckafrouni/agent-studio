@@ -11,6 +11,7 @@ import { trpc } from '@/utils/trpc'
 import { useQuery } from '@tanstack/react-query'
 import { authClient } from '@/lib/auth-client'
 import { redirect } from 'next/navigation'
+import { SiteHeader } from '@/components/layout/site-header'
 
 interface DocumentInfo {
 	id: string
@@ -88,35 +89,38 @@ export default function AdminPage() {
 	const healthCheck = useQuery(trpc.healthCheck.queryOptions())
 
 	return (
-		<div className="container mx-auto grid max-w-4xl grid-cols-1 gap-6 pt-24">
-			<section className="rounded-lg border p-4">
-				<h2 className="mb-2 font-medium">API Status</h2>
-				<div className="flex items-center gap-2">
-					<div
-						className={`h-2 w-2 rounded-full ${healthCheck.data ? 'bg-green-500' : 'bg-red-500'}`}
-					/>
-					<span className="text-muted-foreground text-sm">
-						{healthCheck.isLoading
-							? 'Checking...'
-							: healthCheck.data
-								? 'Connected'
-								: 'Disconnected'}
-					</span>
-				</div>
-			</section>
+		<div className="flex h-full flex-col">
+			<SiteHeader title="Projects" />
+			<div className="container mx-auto grid max-w-4xl grid-cols-1 gap-6 pt-24">
+				<section className="rounded-lg border p-4">
+					<h2 className="mb-2 font-medium">API Status</h2>
+					<div className="flex items-center gap-2">
+						<div
+							className={`h-2 w-2 rounded-full ${healthCheck.data ? 'bg-green-500' : 'bg-red-500'}`}
+						/>
+						<span className="text-muted-foreground text-sm">
+							{healthCheck.isLoading
+								? 'Checking...'
+								: healthCheck.data
+									? 'Connected'
+									: 'Disconnected'}
+						</span>
+					</div>
+				</section>
 
-			<FileUploadCard onUploadSuccess={fetchDocumentList} />
+				<FileUploadCard onUploadSuccess={fetchDocumentList} />
 
-			<SearchCard />
+				<SearchCard />
 
-			<DocumentListCard
-				documents={documentList}
-				isLoading={isLoadingList}
-				error={errorList}
-				onDeleteClick={handleDeleteDocument}
-				isDeleting={isDeleting}
-				docBeingDeletedId={deletingDocId}
-			/>
+				<DocumentListCard
+					documents={documentList}
+					isLoading={isLoadingList}
+					error={errorList}
+					onDeleteClick={handleDeleteDocument}
+					isDeleting={isDeleting}
+					docBeingDeletedId={deletingDocId}
+				/>
+			</div>
 		</div>
 	)
 }

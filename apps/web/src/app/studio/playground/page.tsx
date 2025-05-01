@@ -9,6 +9,7 @@ import { UserMessage } from './components/user-message'
 import { UserInput } from './components/user-input'
 import { ScrollButton } from './components/scroll-button'
 import { DatabaseIcon, GlobeIcon } from 'lucide-react'
+import { SiteHeader } from '@/components/layout/site-header'
 
 const workflowOptions = [
 	{ name: 'vector-rag', label: 'Vector RAG', icon: DatabaseIcon },
@@ -60,6 +61,7 @@ export default function Home() {
 
 	return (
 		<div className="flex h-full flex-col">
+			<SiteHeader title="Playground" />
 			<div
 				id="turns-container"
 				ref={turnsContainerRef}
