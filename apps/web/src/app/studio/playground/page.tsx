@@ -61,7 +61,7 @@ export default function Home() {
 
 	return (
 		<div className="flex h-full flex-col">
-			<SiteHeader title="Playground" />
+			<SiteHeader breadcrumbs={['Playground']} />
 			<div
 				id="turns-container"
 				ref={turnsContainerRef}
