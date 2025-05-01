@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { Toaster } from '@/components/ui/sonner'
-import Providers from './providers'
+import Providers from '@/providers'
 
 export const metadata: Metadata = {
 	title: 'Agent Studio',
@@ -14,7 +14,7 @@ export default function RootLayout({
 	children: React.ReactNode
 }>) {
 	return (
-		<html lang="en">
+		<html lang="en" suppressHydrationWarning>
 			<body className="antialiased">
 				<Providers>
 					<main>{children}</main>
