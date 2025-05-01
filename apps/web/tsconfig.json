@@ -12,18 +12,21 @@
 		"resolveJsonModule": true,
 		"isolatedModules": true,
 		"jsx": "preserve",
+		"paths": {
+			"@/*": ["./src/*"],
+			"@agent-studio/server/*": ["../server/dist/src/*"],
+			"@agent-studio/server": ["../server/dist/src"]
+		},
+		"declaration": true,
+		"declarationMap": true,
 		"incremental": true,
 		"plugins": [
 			{
 				"name": "next"
 			}
-		],
-		"paths": {
-			"@/*": ["./src/*"],
-			"@agent-studio/server/*": ["../server/src/*"],
-			"@agent-studio/server": ["../server/src"]
-		}
+		]
 	},
 	"include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-	"exclude": ["node_modules"]
+	"exclude": ["node_modules"],
+	"references": [{ "path": "../server" }]
 }

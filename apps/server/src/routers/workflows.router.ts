@@ -2,6 +2,7 @@ import { HumanMessage } from '@langchain/core/messages'
 import { Hono } from 'hono'
 import type { HonoEnv } from '@/hono.types'
 import { streamMessages } from '@/lib/utils/stream-helpers'
+import type { StreamableWorkflow } from '@/lib/utils/stream-helpers'
 import vectorRagWorkflow from '@/lib/workflows/vector-rag'
 import webSearchRagWorkflow from '@/lib/workflows/web-search-rag'
 
@@ -26,7 +27,7 @@ router.post('/messages', async (c) => {
 	const selectedWorkflow =
 		workflowName === 'web-search-rag' ? webSearchRagWorkflow : vectorRagWorkflow
 
-	return streamMessages(selectedWorkflow, c, {
+	return streamMessages(selectedWorkflow as StreamableWorkflow, c, {
 		userId: user.id,
 		messages: [
 			new HumanMessage({

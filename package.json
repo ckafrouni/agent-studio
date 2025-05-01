@@ -12,6 +12,7 @@
 		"db:push": "turbo -F server db:push",
 		"db:studio": "turbo -F server db:studio",
 		"lint": "turbo lint",
+		"check-types": "turbo check-types",
 		"format": "prettier . --write",
 		"prepare": "husky"
 	},

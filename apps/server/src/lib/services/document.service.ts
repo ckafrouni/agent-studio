@@ -83,7 +83,7 @@ class DocumentService {
 			}
 
 			const simplifiedMetadatas = validChunks.map((chunk) => {
-				const simpleMeta: Record<string, unknown> = {}
+				const simpleMeta: Record<string, string | number | boolean> = {}
 				for (const key in chunk.metadata) {
 					if (
 						typeof chunk.metadata[key] === 'string' ||

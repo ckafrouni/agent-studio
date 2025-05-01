@@ -8,7 +8,8 @@ interface WorkflowInput {
 	messages: BaseMessage[]
 	userId: string
 }
-type StreamableWorkflow = CompiledStateGraph<WorkflowInput, Partial<WorkflowInput>, string>
+
+export type StreamableWorkflow = CompiledStateGraph<WorkflowInput, Partial<WorkflowInput>, string>
 
 export const streamMessages = (workflow: StreamableWorkflow, c: Context, inputs: WorkflowInput) => {
 	try {
