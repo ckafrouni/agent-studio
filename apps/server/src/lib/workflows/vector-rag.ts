@@ -51,7 +51,6 @@ const doc_retriever = async (state: GraphAnnotationType) => {
 	let documents: any[] = []
 
 	if (!userId) {
-		console.error('User ID is missing in graph state for vector-rag retrieval.')
 		return { documents: [] }
 	}
 

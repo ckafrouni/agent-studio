@@ -79,8 +79,8 @@ export function FileUploadCard({ onUploadSuccess }: FileUploadCardProps) {
 			'text/plain': ['.txt'],
 			'text/markdown': ['.md'],
 		},
-		multiple: true, // Allow multiple files
-		maxSize: 10 * 1024 * 1024, // 10MB limit
+		multiple: true,
+		maxSize: 10 * 1024 * 1024,
 	})
 
 	return (

@@ -66,8 +66,6 @@ const doc_retriever = async (state: GraphAnnotationType) => {
 	let documents: any[] = []
 
 	if (!userId) {
-		console.error('User ID is missing in graph state for web-search-rag retrieval.')
-		// Depending on desired behavior, might route directly to web_searcher or return empty
 		return { documents: [] }
 	}
 
