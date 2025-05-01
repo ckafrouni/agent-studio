@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { documentService } from './document.service'
 import { fileStorageService } from './file-storage.service'
+import { randomUUID } from 'crypto'
 
 const DeleteSchema = z.object({
 	source: z.string().min(1, 'Source filename cannot be empty.'),
@@ -26,6 +27,7 @@ const extractFilename = (sourceUriOrFilename: string | undefined): string | unde
 
 class FileManagementService {
 	async uploadAndProcessDocument(
+		userId: string,
 		fileBuffer: Buffer,
 		originalFilename: string,
 		fileType: string,
@@ -45,11 +47,14 @@ class FileManagementService {
 		}
 
 		try {
-			await fileStorageService.uploadFileToS3(fileBuffer, originalFilename, fileType)
+			const uniqueFilename = `${randomUUID()}-${originalFilename}`
+
+			await fileStorageService.uploadFileToS3(fileBuffer, uniqueFilename, fileType)
 
 			const result = await documentService.addDocumentFromBuffer(
+				userId,
 				fileBuffer,
-				originalFilename,
+				uniqueFilename,
 				fileType,
 			)
 
@@ -70,24 +75,23 @@ class FileManagementService {
 		}
 	}
 
-	async deleteDocument(source: string) {
+	async deleteDocument(userId: string, source: string) {
 		const filename = extractFilename(source)
 		if (!filename) {
 			throw new Error(`Invalid source format: ${source}`)
 		}
 
-		const dbDeleteResult = await documentService.deleteVectorDataBySource(filename)
-
 		try {
 			await fileStorageService.deleteFileFromS3(filename)
 		} catch (s3Error) {
 			return {
-				...dbDeleteResult,
 				warning: `Vector data deleted, but failed to delete file from S3: ${
 					s3Error instanceof Error ? s3Error.message : 'Unknown S3 error'
 				}`,
 			}
 		}
+
+		const dbDeleteResult = await documentService.deleteVectorDataBySource(userId, filename)
 
 		return dbDeleteResult
 	}

@@ -14,6 +14,12 @@ router.post('/messages', async (c) => {
 		workflow?: string
 	}>()
 
+	const user = c.get('user')
+
+	if (!user?.id) {
+		return c.json({ error: 'Unauthorized' }, 401)
+	}
+
 	if (!prompt) {
 		return c.json({ error: 'Missing prompt' }, 400)
 	}
@@ -22,6 +28,7 @@ router.post('/messages', async (c) => {
 		workflowName === 'web-search-rag' ? webSearchRagWorkflow : vectorRagWorkflow
 
 	return streamMessages(selectedWorkflow, c, {
+		userId: user.id,
 		messages: [
 			new HumanMessage({
 				content: prompt,

@@ -6,7 +6,7 @@ import { toast } from 'sonner'
 import { Loader2, AlertTriangle } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { env } from '@/env'
+import { apiFetch } from '@/lib/utils'
 
 interface FileUploadCardProps {
 	onUploadSuccess: () => void
@@ -37,7 +37,7 @@ export function FileUploadCard({ onUploadSuccess }: FileUploadCardProps) {
 				formData.append('file', file)
 
 				try {
-					const response = await fetch(`${env.NEXT_PUBLIC_SERVER_URL}/api/files/upload`, {
+					const response = await apiFetch(`/api/files/upload`, {
 						method: 'POST',
 						body: formData,
 					})

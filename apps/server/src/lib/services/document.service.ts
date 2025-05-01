@@ -1,4 +1,4 @@
-import { collection } from '@/lib/vector-database/chroma'
+import { getUserCollection } from '@/lib/vector-database/chroma'
 import { IncludeEnum } from 'chromadb'
 import { z } from 'zod'
 import { PDFLoader } from '@langchain/community/document_loaders/fs/pdf'
@@ -43,11 +43,13 @@ const extractFilename = (sourceUriOrFilename: string | undefined): string | unde
 
 class DocumentService {
 	async addDocumentFromBuffer(
+		userId: string,
 		fileBuffer: Buffer,
 		fileName: string,
 		fileType: string,
 	): Promise<AddDocumentResult> {
 		let docs: Document[] = []
+		const userCollection = await getUserCollection(userId)
 
 		try {
 			const fileBlob = new Blob([fileBuffer], { type: fileType })
@@ -107,7 +109,7 @@ class DocumentService {
 
 			const ids = validChunks.map((_, index) => `${fileName}_${Date.now()}_${index}`)
 
-			await collection.add({
+			await userCollection.add({
 				ids,
 				documents: validChunks.map((chunk) => chunk.pageContent),
 				metadatas: simplifiedMetadatas,
@@ -124,9 +126,10 @@ class DocumentService {
 		}
 	}
 
-	async listDocuments() {
+	async listDocuments(userId: string) {
+		const userCollection = await getUserCollection(userId)
 		try {
-			const results = await collection.get({
+			const results = await userCollection.get({
 				limit: 1000,
 				include: [IncludeEnum.Metadatas],
 			})
@@ -148,7 +151,8 @@ class DocumentService {
 		}
 	}
 
-	async searchDocuments(query: string, k?: number) {
+	async searchDocuments(userId: string, query: string, k?: number) {
+		const userCollection = await getUserCollection(userId)
 		const validation = SearchSchema.safeParse({ query, k })
 		if (!validation.success) {
 			const errorMessages = validation.error.errors
@@ -161,7 +165,7 @@ class DocumentService {
 		const validatedK = validation.data.k
 
 		try {
-			const results = await collection.query({
+			const results = await userCollection.query({
 				queryTexts: [validatedQuery],
 				nResults: validatedK,
 				include: [IncludeEnum.Metadatas, IncludeEnum.Documents, IncludeEnum.Distances],
@@ -192,7 +196,8 @@ class DocumentService {
 		}
 	}
 
-	async deleteVectorDataBySource(source: string) {
+	async deleteVectorDataBySource(userId: string, source: string) {
+		const userCollection = await getUserCollection(userId)
 		const validation = DeleteSchema.safeParse({ source })
 		if (!validation.success) {
 			const errorMessages = validation.error.errors
@@ -203,7 +208,7 @@ class DocumentService {
 		const validatedFilename = validation.data.source
 
 		try {
-			const deleteResult = await collection.delete({
+			const deleteResult = await userCollection.delete({
 				where: { source: validatedFilename },
 			})
 			const deletedCount = Array.isArray(deleteResult) ? deleteResult.length : undefined

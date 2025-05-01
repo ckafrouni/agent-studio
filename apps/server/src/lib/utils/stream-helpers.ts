@@ -4,7 +4,7 @@ import type { BaseMessage } from '@langchain/core/messages'
 import type { IterableReadableStream } from '@langchain/core/utils/stream'
 import type { CompiledStateGraph } from '@langchain/langgraph'
 
-type WorkflowInput = { messages: BaseMessage[] }
+type WorkflowInput = { messages: BaseMessage[]; userId: string }
 type StreamableWorkflow = CompiledStateGraph<any, Partial<WorkflowInput>, any>
 
 export const streamMessages = async (

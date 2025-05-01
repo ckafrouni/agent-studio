@@ -4,7 +4,7 @@ import { StateGraph, START, END, Annotation } from '@langchain/langgraph'
 import { BaseMessage, SystemMessage } from '@langchain/core/messages'
 import { PromptTemplate } from '@langchain/core/prompts'
 import type { DocumentInterface } from '@langchain/core/documents'
-import { collection } from '@/lib/vector-database/chroma'
+import { getUserCollection } from '@/lib/vector-database/chroma'
 import { ChromaNotFoundError } from 'chromadb'
 
 export interface Document extends DocumentInterface {
@@ -33,6 +33,7 @@ export const GraphAnnotation = Annotation.Root({
 	documents: Annotation<Document[]>,
 	routing: Annotation<Routes>,
 	final_node: Annotation<boolean>,
+	userId: Annotation<string>,
 })
 
 export type GraphAnnotationType = typeof GraphAnnotation.State
@@ -46,9 +47,17 @@ const model = new ChatOpenAI({
 // MARK: - Retrieval Function
 const doc_retriever = async (state: GraphAnnotationType) => {
 	const query = state.messages[state.messages.length - 1].content as string
+	const userId = state.userId
 	let documents: any[] = []
 
-	const results = await collection.query({
+	if (!userId) {
+		console.error('User ID is missing in graph state for vector-rag retrieval.')
+		return { documents: [] }
+	}
+
+	const userCollection = await getUserCollection(userId)
+
+	const results = await userCollection.query({
 		nResults: 5,
 		queryTexts: [query],
 	})

@@ -8,6 +8,12 @@ import type { HonoEnv } from '@/hono.types'
 const filesRouter = new Hono<HonoEnv>()
 	.post('/upload', async (c) => {
 		try {
+			const user = c.get('user')
+			if (!user?.id) {
+				return c.json({ error: 'Unauthorized' }, 401)
+			}
+			const userId = user.id
+
 			const formData = await c.req.formData()
 			const file = formData.get('file') as File | null
 
@@ -18,6 +24,7 @@ const filesRouter = new Hono<HonoEnv>()
 			const fileBuffer = Buffer.from(await file.arrayBuffer())
 
 			const result = await fileManagementService.uploadAndProcessDocument(
+				userId,
 				fileBuffer,
 				file.name,
 				file.type,
@@ -37,13 +44,14 @@ const filesRouter = new Hono<HonoEnv>()
 	})
 
 	.get('/', async (c) => {
-		const session = c.get('session')
-		if (!session) {
+		const user = c.get('user')
+		if (!user?.id) {
 			return c.json({ error: 'Unauthorized' }, 401)
 		}
+		const userId = user.id
 
 		try {
-			const result = await documentService.listDocuments()
+			const result = await documentService.listDocuments(userId)
 			return c.json(result)
 		} catch (error) {
 			const message = error instanceof Error ? error.message : 'Failed to list documents.'
@@ -53,9 +61,15 @@ const filesRouter = new Hono<HonoEnv>()
 
 	.post('/search', async (c) => {
 		try {
+			const user = c.get('user')
+			if (!user?.id) {
+				return c.json({ error: 'Unauthorized' }, 401)
+			}
+			const userId = user.id
+
 			const body = await c.req.json()
 			const { query, k } = body
-			const results = await documentService.searchDocuments(query, k)
+			const results = await documentService.searchDocuments(userId, query, k)
 			return c.json(results)
 		} catch (error) {
 			const message = error instanceof Error ? error.message : 'Search failed.'
@@ -91,8 +105,14 @@ const filesRouter = new Hono<HonoEnv>()
 
 	.delete('/:source', async (c) => {
 		try {
+			const user = c.get('user')
+			if (!user?.id) {
+				return c.json({ error: 'Unauthorized' }, 401)
+			}
+			const userId = user.id
+
 			const source = c.req.param('source')
-			const result = await fileManagementService.deleteDocument(source)
+			const result = await fileManagementService.deleteDocument(userId, source)
 			return c.json(result)
 		} catch (error) {
 			const message = error instanceof Error ? error.message : 'Failed to delete document.'

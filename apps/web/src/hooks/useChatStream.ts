@@ -1,8 +1,7 @@
 import { useState, useCallback } from 'react'
 import { HumanMessage, AIMessage, AIMessageChunk } from '@langchain/core/messages'
 import type { Turn, Document, RetrieverOutput } from '@/types/chat'
-import { isAIMessageChunk } from '@/lib/utils'
-import { env } from '@/env'
+import { apiFetch, isAIMessageChunk } from '@/lib/utils'
 
 export type Workflow = 'vector-rag' | 'web-search-rag'
 
@@ -21,12 +20,8 @@ export function useChatStream() {
 		])
 
 		try {
-			const response = await fetch(`${env.NEXT_PUBLIC_SERVER_URL}/api/workflows/messages`, {
+			const response = await apiFetch(`/api/workflows/messages`, {
 				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					Accept: 'application/x-ndjson',
-				},
 				body: JSON.stringify({ prompt, workflow }),
 			})
 

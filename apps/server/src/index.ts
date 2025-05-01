@@ -26,16 +26,21 @@ app.use(
 )
 
 app.use('/api/*', async (c, next) => {
+	console.log(`Auth middleware triggered for: ${c.req.path}`)
 	const session = await auth.api.getSession({
 		headers: c.req.raw.headers,
 	})
 
+	console.log('Session object:', JSON.stringify(session, null, 2))
+
 	if (!session) {
+		console.log('No session found.')
 		c.set('session', null)
 		c.set('user', null)
 		return next()
 	}
 
+	console.log('Session found. User object:', JSON.stringify(session.user, null, 2))
 	c.set('session', session.session)
 	c.set('user', session.user)
 	await next()

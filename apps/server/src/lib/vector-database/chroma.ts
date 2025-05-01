@@ -9,8 +9,17 @@ const embeddingFunction = new OpenAIEmbeddingFunction({
 
 const client = new ChromaClient()
 
-export const collection = await client.getOrCreateCollection({
-	name: env.CHROMA_COLLECTION_NAME,
-	embeddingFunction: embeddingFunction,
-	metadata: { 'hnsw:space': 'cosine' },
-})
+/**
+ * Retrieves or creates a ChromaDB collection specific to a user.
+ * @param userId The unique identifier for the user.
+ * @returns The user-specific ChromaDB collection.
+ */
+export async function getUserCollection(userId: string) {
+	const collectionName = `user-${userId}` // Or any other naming scheme
+	const collection = await client.getOrCreateCollection({
+		name: collectionName,
+		embeddingFunction: embeddingFunction,
+		metadata: { 'hnsw:space': 'cosine' }, // Keep cosine distance
+	})
+	return collection
+}

@@ -6,8 +6,8 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { env } from '@/env'
 import { toast } from 'sonner'
+import { apiFetch } from '@/lib/utils'
 
 interface SearchResultItem {
 	id: string
@@ -36,11 +36,8 @@ export function SearchCard() {
 		setSearchResults([])
 
 		try {
-			const response = await fetch(`${env.NEXT_PUBLIC_SERVER_URL}/api/files/search`, {
+			const response = await apiFetch(`/api/files/search`, {
 				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
 				body: JSON.stringify({ query: searchQuery }),
 			})
 
