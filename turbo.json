@@ -9,7 +9,8 @@
 		},
 		"dev": {
 			"persistent": true,
-			"cache": false
+			"cache": false,
+			"inputs": ["$TURBO_DEFAULTS$", ".env*"]
 		},
 		"lint": {
 			"dependsOn": ["^lint"]

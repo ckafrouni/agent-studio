@@ -1,4 +1,5 @@
 import { trpcServer } from '@hono/trpc-server'
+import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { logger } from 'hono/logger'
@@ -67,3 +68,12 @@ app.get('/heartbeat', (c) => {
 
 export { type AppRouter }
 export default app
+
+// Start the server
+const port = Number.parseInt(env.PORT || '3030', 10)
+console.log(`Server listening on port ${port}`)
+
+serve({
+	fetch: app.fetch,
+	port,
+})

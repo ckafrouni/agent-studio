@@ -28,6 +28,8 @@ export const env = createEnv({
 		CHUNK_OVERLAP: z.coerce.number().int().nonnegative().optional().default(200),
 		EMBEDDING_DIMENSIONS: z.coerce.number().int().positive().optional().default(1536), // Adjust based on text-embedding-3-small
 
+		PORT: z.string().optional().default('3030'),
+
 		S3_BUCKET_NAME: z.string().min(1),
 		S3_ENDPOINT_URL: z.string().url().optional(),
 		AWS_REGION: z.string().min(1),

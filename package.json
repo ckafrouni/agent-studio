@@ -1,16 +1,13 @@
 {
 	"name": "agent-studio",
 	"private": true,
-	"workspaces": [
-		"apps/*"
-	],
 	"scripts": {
 		"dev": "turbo dev",
 		"build": "turbo build",
 		"dev:web": "turbo -F web dev",
-		"dev:server": "turbo -F server dev",
-		"db:push": "turbo -F server db:push",
-		"db:studio": "turbo -F server db:studio",
+		"dev:server": "turbo -F @agent-studio/server dev",
+		"db:push": "turbo -F @agent-studio/server db:push",
+		"db:studio": "turbo -F @agent-studio/server db:studio",
 		"lint": "turbo lint",
 		"check-types": "turbo check-types",
 		"format": "prettier . --write",
@@ -28,5 +25,5 @@
 		"prettier-plugin-tailwindcss": "^0.6.11",
 		"turbo": "^2.5.2"
 	},
-	"packageManager": "bun@1.2.2"
+	"packageManager": "pnpm@10.7.1"
 }
