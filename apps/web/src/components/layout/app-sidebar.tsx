@@ -13,7 +13,6 @@ import {
 	IconGrain,
 	IconHelp,
 	IconReport,
-	IconSearch,
 	IconSettings,
 	IconTestPipe,
 	IconUsers,
@@ -34,6 +33,15 @@ import {
 } from '@/components/ui/sidebar'
 import Link from 'next/link'
 import { authClient } from '@/lib/auth-client'
+import {
+	CommandDialog,
+	CommandEmpty,
+	CommandGroup,
+	CommandInput,
+	CommandItem,
+	CommandList,
+} from '@/components/ui/command'
+import { useEffect, useState } from 'react'
 
 const data = {
 	navMain: [
@@ -127,11 +135,6 @@ const data = {
 			url: '#',
 			icon: IconHelp,
 		},
-		{
-			title: 'Search',
-			url: '#',
-			icon: IconSearch,
-		},
 	],
 	documents: [
 		{
@@ -152,8 +155,42 @@ const data = {
 	],
 }
 
+export function CommandMenu({
+	open,
+	setOpen,
+}: {
+	open: boolean
+	setOpen: (open: boolean) => void
+}) {
+	useEffect(() => {
+		const down = (e: KeyboardEvent) => {
+			if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
+				e.preventDefault()
+				setOpen(!open)
+			}
+		}
+		document.addEventListener('keydown', down)
+		return () => document.removeEventListener('keydown', down)
+	}, [open, setOpen])
+
+	return (
+		<CommandDialog open={open} onOpenChange={setOpen}>
+			<CommandInput placeholder="Type a command or search..." />
+			<CommandList>
+				<CommandEmpty>No results found.</CommandEmpty>
+				<CommandGroup heading="Suggestions">
+					<CommandItem>Calendar</CommandItem>
+					<CommandItem>Search Emoji</CommandItem>
+					<CommandItem>Calculator</CommandItem>
+				</CommandGroup>
+			</CommandList>
+		</CommandDialog>
+	)
+}
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	const { data: session } = authClient.useSession()
+	const [openCommand, setOpenCommand] = useState(false)
 
 	return (
 		<Sidebar collapsible="offcanvas" {...props}>
@@ -172,7 +209,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 			<SidebarContent>
 				<NavMain items={data.navMain} />
 				<NavDocuments items={data.documents} />
-				<NavSecondary items={data.navSecondary} className="mt-auto" />
+				<NavSecondary
+					items={data.navSecondary}
+					setOpenCommand={setOpenCommand}
+					className="mt-auto"
+				/>
 			</SidebarContent>
 			<SidebarFooter>
 				<NavUser
@@ -183,6 +224,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 					}}
 				/>
 			</SidebarFooter>
+			<CommandMenu open={openCommand} setOpen={setOpenCommand} />
 		</Sidebar>
 	)
 }
