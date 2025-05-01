@@ -6,6 +6,7 @@ import Providers from './providers'
 export const metadata: Metadata = {
 	title: 'Agent Studio',
 	description: 'Build, Host, and Manage your AI Agents',
+	icons: '/favicon.svg',
 }
 
 export default function RootLayout({
