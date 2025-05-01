@@ -1,11 +1,11 @@
-import { env } from '@/env'
-import { ChatOpenAI } from '@langchain/openai'
-import { StateGraph, START, END, Annotation } from '@langchain/langgraph'
-import { BaseMessage, SystemMessage } from '@langchain/core/messages'
-import { PromptTemplate } from '@langchain/core/prompts'
 import type { DocumentInterface } from '@langchain/core/documents'
+import type { BaseMessage } from '@langchain/core/messages'
+import { SystemMessage } from '@langchain/core/messages'
+import { PromptTemplate } from '@langchain/core/prompts'
+import { StateGraph, START, END, Annotation } from '@langchain/langgraph'
+import { ChatOpenAI } from '@langchain/openai'
+import { env } from '@/env'
 import { getUserCollection } from '@/lib/vector-database/chroma'
-import { ChromaNotFoundError } from 'chromadb'
 
 export interface Document extends DocumentInterface {
 	metadata: {
@@ -21,7 +21,7 @@ const extractContextFromDocumentRetrieval = (docs: Document[]): string => {
 	return docs
 		.map(
 			(doc, index) =>
-				`[Index: ${index + 1} | Source: ${doc.metadata.source} | ID: ${
+				`[Index: ${String(index + 1)} | Source: ${doc.metadata.source} | ID: ${
 					doc.metadata.id
 				}] ${doc.pageContent}`,
 		)
@@ -48,7 +48,7 @@ const model = new ChatOpenAI({
 const doc_retriever = async (state: GraphAnnotationType) => {
 	const query = state.messages[state.messages.length - 1].content as string
 	const userId = state.userId
-	let documents: any[] = []
+	let documents: Document[] = []
 
 	if (!userId) {
 		return { documents: [] }
@@ -61,27 +61,27 @@ const doc_retriever = async (state: GraphAnnotationType) => {
 		queryTexts: [query],
 	})
 
-	if (results && results.documents && results.documents.length > 0 && results.documents[0]) {
-		documents = results.documents[0]
-			.map((doc, i) => ({
-				pageContent: doc,
-				metadata: {
-					id: results.ids?.[0]?.[i],
-					distance: results.distances?.[0]?.[i] ?? 1,
-					source: results.metadatas?.[0]?.[i]?.source,
-				},
-			}))
-			.filter((doc) => {
-				const distance = doc.metadata.distance
-				return distance !== null && distance < 0.8
-			})
-	}
+	documents = results.documents[0]
+		.map((doc, i) => ({
+			pageContent: doc ?? '',
+			metadata: {
+				id: results.ids[0][i],
+				distance: results.distances?.[0]?.[i] ?? 1,
+				// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- TS needs '?.' but eslint disagrees
+				source: String(results.metadatas?.[0]?.[i]?.source ?? 'Unknown Source'),
+			},
+		}))
+		.filter((doc) => doc.metadata.distance < 0.8)
+
+	console.log(
+		`Retrieved ${String(documents.length)} documents for query: ${query.substring(0, 50)}...`,
+	)
 
 	return { documents }
 }
 
 // MARK: - Check Retrieval Quality
-const rag_checker = async (state: GraphAnnotationType) => {
+const rag_checker = (state: GraphAnnotationType): { routing: Routes } => {
 	return state.documents.length > 0 ? { routing: 'generator' } : { routing: 'fallback' }
 }
 

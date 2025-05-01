@@ -1,9 +1,9 @@
+import { NoSuchKey } from '@aws-sdk/client-s3'
 import { Hono } from 'hono'
-import { fileStorageService } from '@/lib/services/file-storage.service'
+import type { HonoEnv } from '@/hono.types'
 import { documentService } from '@/lib/services/document.service'
 import { fileManagementService } from '@/lib/services/file-management.service'
-import { NoSuchKey } from '@aws-sdk/client-s3'
-import type { HonoEnv } from '@/hono.types'
+import { fileStorageService } from '@/lib/services/file-storage.service'
 
 const filesRouter = new Hono<HonoEnv>()
 	.post('/upload', async (c) => {
@@ -32,11 +32,12 @@ const filesRouter = new Hono<HonoEnv>()
 			)
 
 			return c.json(result, 201)
-		} catch (error: any) {
+		} catch (error: unknown) {
+			const message = error instanceof Error ? error.message : 'Unknown error'
 			return c.json(
 				{
 					error: 'Failed to upload or process file.',
-					message: error.message,
+					message,
 				},
 				500,
 			)
@@ -67,7 +68,7 @@ const filesRouter = new Hono<HonoEnv>()
 			}
 			const userId = user.id
 
-			const body = await c.req.json()
+			const body = await c.req.json<{ query: string; k?: number }>()
 			const { query, k } = body
 			const results = await documentService.searchDocuments(userId, query, k)
 			return c.json(results)
@@ -85,21 +86,18 @@ const filesRouter = new Hono<HonoEnv>()
 		try {
 			const fileData = await fileStorageService.getFileFromS3(source)
 
-			if (!fileData || !fileData.buffer) {
-				return c.notFound()
-			}
-
 			const contentType = fileData.contentType
 
-			c.header('Content-Type', contentType || 'application/octet-stream')
+			c.header('Content-Type', contentType ?? 'application/octet-stream')
 			c.header('Content-Disposition', `inline; filename="${source}"`)
 
 			return c.body(fileData.buffer)
-		} catch (error: any) {
+		} catch (error: unknown) {
 			if (error instanceof NoSuchKey) {
 				return c.notFound()
 			}
-			return c.json({ error: 'Failed to retrieve file', message: error.message }, 500)
+			const message = error instanceof Error ? error.message : 'Unknown error'
+			return c.json({ error: 'Failed to retrieve file', message }, 500)
 		}
 	})
 

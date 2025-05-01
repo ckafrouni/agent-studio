@@ -1,5 +1,5 @@
-import { env } from '@/env'
 import { ChromaClient, OpenAIEmbeddingFunction } from 'chromadb'
+import { env } from '@/env'
 
 // MARK: - Embedding
 const embeddingFunction = new OpenAIEmbeddingFunction({

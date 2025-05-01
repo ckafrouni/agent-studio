@@ -1,16 +1,16 @@
+import { trpcServer } from '@hono/trpc-server'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { logger } from 'hono/logger'
-import { prettyJSON } from 'hono/pretty-json'
-import { trpcServer } from '@hono/trpc-server'
-import { auth } from '@/lib/auth'
 import type { HonoEnv } from './hono.types'
 
-import workflowsRouter from '@/routers/workflows.router'
-import { filesRouter } from '@/routers/files.router'
 import { env } from '@/env'
+import { auth } from '@/lib/auth'
 import { createContext } from '@/lib/context'
-import { appRouter, type AppRouter } from '@/routers'
+import { appRouter } from '@/routers'
+import type { AppRouter } from '@/routers'
+import { filesRouter } from '@/routers/files.router'
+import workflowsRouter from '@/routers/workflows.router'
 
 const app = new Hono<HonoEnv>()
 

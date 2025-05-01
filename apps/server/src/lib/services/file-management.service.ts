@@ -1,27 +1,15 @@
-import { z } from 'zod'
+import { randomUUID } from 'crypto'
 import { documentService } from './document.service'
 import { fileStorageService } from './file-storage.service'
-import { randomUUID } from 'crypto'
-
-const DeleteSchema = z.object({
-	source: z.string().min(1, 'Source filename cannot be empty.'),
-})
 
 const extractFilename = (sourceUriOrFilename: string | undefined): string | undefined => {
 	if (!sourceUriOrFilename) return undefined
 	try {
-		let decodedSource = decodeURIComponent(sourceUriOrFilename)
-		if (decodedSource.startsWith('s3://')) {
-			const parts = decodedSource.split('/')
-			return parts[parts.length - 1]
-		}
-		return decodedSource
-	} catch (e) {
-		try {
-			return decodeURIComponent(sourceUriOrFilename)
-		} catch {
-			return sourceUriOrFilename
-		}
+		const uri = new URL(sourceUriOrFilename)
+		return uri.pathname.split('/').pop()
+	} catch (_e) {
+		// If it's not a valid URL, assume it's a filename
+		return sourceUriOrFilename
 	}
 }
 
@@ -33,7 +21,7 @@ class FileManagementService {
 		fileType: string,
 		fileSize: number,
 	) {
-		if (!fileBuffer || fileBuffer.length === 0) {
+		if (fileBuffer.length === 0) {
 			throw new Error('File buffer cannot be empty.')
 		}
 		if (!originalFilename) {
@@ -42,7 +30,7 @@ class FileManagementService {
 		if (!fileType) {
 			throw new Error('File type (mimetype) is required.')
 		}
-		if (fileSize === undefined || fileSize < 0) {
+		if (fileSize < 0) {
 			throw new Error('Valid file size is required.')
 		}
 
@@ -60,7 +48,7 @@ class FileManagementService {
 
 			return {
 				success: true,
-				message: `Successfully uploaded and processed ${originalFilename}. ${result.chunksAdded} chunk(s) added.`,
+				message: `Successfully uploaded and processed ${originalFilename}. ${String(result.chunksAdded)} chunk(s) added.`,
 				fileName: result.fileName,
 				docCount: result.docCount,
 				chunksAdded: result.chunksAdded,

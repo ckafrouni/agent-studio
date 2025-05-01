@@ -1,12 +1,13 @@
-import { env } from '@/env'
-import { ChatOpenAI } from '@langchain/openai'
-import { StateGraph, START, END, Annotation } from '@langchain/langgraph'
-import { BaseMessage, SystemMessage } from '@langchain/core/messages'
+import type { DocumentInterface } from '@langchain/core/documents'
+import type { BaseMessage } from '@langchain/core/messages'
+import { SystemMessage } from '@langchain/core/messages'
 import { PromptTemplate } from '@langchain/core/prompts'
-import { type DocumentInterface } from '@langchain/core/documents'
+import { StateGraph, START, END, Annotation } from '@langchain/langgraph'
+import { ChatOpenAI } from '@langchain/openai'
+import { TavilySearch } from '@langchain/tavily'
+import type { TavilySearchResponse } from '@langchain/tavily'
+import { env } from '@/env'
 import { getUserCollection } from '@/lib/vector-database/chroma'
-import { ChromaNotFoundError } from 'chromadb'
-import { TavilySearch, type TavilySearchResponse } from '@langchain/tavily'
 
 export interface Document extends DocumentInterface {
 	metadata: {
@@ -22,7 +23,7 @@ const extractContextFromDocumentRetrieval = (docs: Document[]): string => {
 	return docs
 		.map(
 			(doc, index) =>
-				`[Index: ${index + 1} | Source: ${doc.metadata.source} | ID: ${
+				`[Index: ${String(index + 1)} | Source: ${doc.metadata.source} | ID: ${
 					doc.metadata.id
 				}] ${doc.pageContent}`,
 		)
@@ -30,13 +31,13 @@ const extractContextFromDocumentRetrieval = (docs: Document[]): string => {
 }
 
 const extractContextFromTavilyResponse = (response: TavilySearchResponse): string => {
-	if (!response || response.length === 0) {
+	if (response.results.length === 0) {
 		return 'No web search results found.'
 	}
 	return response.results
 		.map(
 			(result, index) =>
-				`[Index: ${index + 1} | URL: ${result.url} | Title: ${result.title}]
+				`[Index: ${String(index + 1)} | URL: ${result.url} | Title: ${result.title}]
 ${result.content}`,
 		)
 		.join('\n\n---\n\n')
@@ -63,7 +64,7 @@ const model = new ChatOpenAI({
 const doc_retriever = async (state: GraphAnnotationType) => {
 	const query = state.messages[state.messages.length - 1].content as string
 	const userId = state.userId
-	let documents: any[] = []
+	let documents: Document[] = []
 
 	if (!userId) {
 		return { documents: [] }
@@ -76,19 +77,19 @@ const doc_retriever = async (state: GraphAnnotationType) => {
 		queryTexts: [query],
 	})
 
-	if (results && results.documents && results.documents.length > 0 && results.documents[0]) {
+	if (results.documents[0]?.length > 0) {
 		documents = results.documents[0]
 			.map((doc, i) => ({
-				pageContent: doc,
+				pageContent: doc ?? '',
 				metadata: {
-					id: results.ids?.[0]?.[i],
-					distance: results.distances?.[0]?.[i] ?? 1,
-					source: results.metadatas?.[0]?.[i]?.source,
+					id: results.ids[0][i],
+					distance: results.distances?.[0][i] ?? 1,
+					source: String(results.metadatas[0][i]?.source ?? 'Unknown Source'),
 				},
 			}))
 			.filter((doc) => {
-				const distance = doc.metadata.distance
-				return distance !== null && distance < 0.8
+				// Filter out documents with distance > 0.6 (too dissimilar)
+				return doc.metadata.distance <= 0.6
 			})
 	}
 
@@ -96,7 +97,7 @@ const doc_retriever = async (state: GraphAnnotationType) => {
 }
 
 // MARK: - Document Check & Routing
-const rag_checker = async (state: GraphAnnotationType) => {
+const rag_checker = (state: GraphAnnotationType): { routing: Routes } => {
 	return state.documents.length > 0 ? { routing: 'generator' } : { routing: 'web_searcher' }
 }
 
@@ -148,7 +149,8 @@ const web_searcher = async (state: GraphAnnotationType) => {
 		maxResults: 3,
 		tavilyApiKey: env.TAVILY_API_KEY,
 	})
-	const web_context = await tool.invoke({ query: question })
+	// Cast the result explicitly as the linter cannot infer the type from invoke
+	const web_context = (await tool.invoke({ query: question })) as TavilySearchResponse | null
 
 	return !web_context
 		? { web_context: 'No relevant information found after web search.' }
@@ -160,7 +162,10 @@ const web_generator = async (state: GraphAnnotationType) => {
 	const last_message = state.messages[state.messages.length - 1]
 	const question = last_message.content as string
 
-	const web_context = extractContextFromTavilyResponse(state.web_context!)
+	// Handle potential null/undefined web_context without non-null assertion
+	const web_context_content = state.web_context
+		? extractContextFromTavilyResponse(state.web_context)
+		: '' // Provide a default empty string or handle appropriately
 
 	const prompt = await PromptTemplate.fromTemplate(
 		`
@@ -186,7 +191,7 @@ const web_generator = async (state: GraphAnnotationType) => {
     
     Answer:
     `,
-	).format({ question, web_context })
+	).format({ question, web_context: web_context_content }) // Use the safe variable
 
 	const response = await model.invoke([...state.messages, new SystemMessage(prompt)])
 

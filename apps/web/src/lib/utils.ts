@@ -35,7 +35,7 @@ export async function apiFetch(path: string, options: RequestInit = {}): Promise
 		...options,
 		credentials: 'include',
 		headers: {
-			...(options.headers || {}),
+			...(options.headers ?? {}),
 		},
 	}
 

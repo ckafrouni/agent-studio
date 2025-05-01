@@ -8,8 +8,8 @@ const s3ClientConfig = {
 		endpoint: env.S3_ENDPOINT_URL,
 		forcePathStyle: true,
 		credentials: {
-			accessKeyId: env.AWS_ACCESS_KEY_ID || 'test',
-			secretAccessKey: env.AWS_SECRET_ACCESS_KEY || 'test',
+			accessKeyId: env.AWS_ACCESS_KEY_ID ?? 'test',
+			secretAccessKey: env.AWS_SECRET_ACCESS_KEY ?? 'test',
 		},
 	}),
 }

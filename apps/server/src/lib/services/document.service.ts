@@ -1,12 +1,12 @@
-import { getUserCollection } from '@/lib/vector-database/chroma'
-import { IncludeEnum } from 'chromadb'
-import { z } from 'zod'
 import { PDFLoader } from '@langchain/community/document_loaders/fs/pdf'
-import { TextLoader } from 'langchain/document_loaders/fs/text'
-import mammoth from 'mammoth'
-import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter'
 import { Document } from '@langchain/core/documents'
+import { IncludeEnum } from 'chromadb'
+import { TextLoader } from 'langchain/document_loaders/fs/text'
+import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter'
+import mammoth from 'mammoth'
+import { z } from 'zod'
 import { env } from '@/env'
+import { getUserCollection } from '@/lib/vector-database/chroma'
 
 const SearchSchema = z.object({
 	query: z.string().min(1, 'Search query cannot be empty.'),
@@ -36,7 +36,7 @@ const extractFilename = (sourceUriOrFilename: string | undefined): string | unde
 			return parts[parts.length - 1]
 		}
 		return sourceUriOrFilename
-	} catch (e) {
+	} catch {
 		return sourceUriOrFilename
 	}
 }
@@ -69,14 +69,6 @@ class DocumentService {
 				throw new Error(`Unsupported file type: ${fileType}`)
 			}
 
-			if (!docs || docs.length === 0) {
-				return {
-					fileName,
-					docCount: 0,
-					chunksAdded: 0,
-				}
-			}
-
 			const chunks = await splitter.splitDocuments(docs)
 			const validChunks = chunks.filter(
 				(chunk) => chunk.pageContent && chunk.pageContent.trim() !== '',
@@ -91,23 +83,23 @@ class DocumentService {
 			}
 
 			const simplifiedMetadatas = validChunks.map((chunk) => {
-				const simpleMeta: { [key: string]: any } = {}
-				if (chunk.metadata) {
-					for (const key in chunk.metadata) {
-						if (
-							typeof chunk.metadata[key] === 'string' ||
-							typeof chunk.metadata[key] === 'number' ||
-							typeof chunk.metadata[key] === 'boolean'
-						) {
-							simpleMeta[key] = chunk.metadata[key]
-						}
+				const simpleMeta: Record<string, unknown> = {}
+				for (const key in chunk.metadata) {
+					if (
+						typeof chunk.metadata[key] === 'string' ||
+						typeof chunk.metadata[key] === 'number' ||
+						typeof chunk.metadata[key] === 'boolean'
+					) {
+						simpleMeta[key] = chunk.metadata[key]
 					}
 				}
 				simpleMeta.source = fileName
 				return simpleMeta
 			})
 
-			const ids = validChunks.map((_, index) => `${fileName}_${Date.now()}_${index}`)
+			const ids = validChunks.map(
+				(_, index) => `${fileName}_${String(Date.now())}_${String(index)}`,
+			)
 
 			await userCollection.add({
 				ids,
@@ -120,8 +112,8 @@ class DocumentService {
 				docCount: docs.length,
 				chunksAdded: validChunks.length,
 			}
-		} catch (error) {
-			const message = error instanceof Error ? error.message : 'File processing failed.'
+		} catch (_error) {
+			const message = _error instanceof Error ? _error.message : 'File processing failed.'
 			throw new Error(`Failed to process file ${fileName}: ${message}`)
 		}
 	}
@@ -136,6 +128,7 @@ class DocumentService {
 
 			const uniqueSources = new Map<string, { id: string; metadata: { source?: string } }>()
 			results.ids.forEach((id, index) => {
+				// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- metadata can be nullish due to optional chain above
 				const metadata = results.metadatas?.[index]
 				const originalSource = metadata?.source as string | undefined
 				const filename = extractFilename(originalSource)
@@ -146,7 +139,7 @@ class DocumentService {
 			})
 
 			return { documents: Array.from(uniqueSources.values()) }
-		} catch (error) {
+		} catch (_error) {
 			throw new Error('Failed to retrieve document list from vector store.')
 		}
 	}
@@ -171,27 +164,23 @@ class DocumentService {
 				include: [IncludeEnum.Metadatas, IncludeEnum.Documents, IncludeEnum.Distances],
 			})
 
+			// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- results.ids?.[0] can be undefined if results.ids is empty
 			const resultCount = results.ids?.[0]?.length ?? 0
-			if (
-				resultCount === 0 ||
-				!results.documents?.[0] ||
-				!results.metadatas?.[0] ||
-				!results.distances?.[0]
-			) {
+			if (resultCount === 0) {
 				return { results: [] }
 			}
 
 			const formattedResults = results.ids[0].map((id, index) => ({
 				id,
-				document: results.documents![0][index] ?? '',
+				document: results.documents[0][index] ?? '',
 				metadata: {
-					...(results.metadatas![0][index] ?? {}),
-					distance: results.distances![0][index] ?? null,
+					...(results.metadatas[0][index] ?? {}),
+					distance: results.distances?.[0]?.[index] ?? null,
 				},
 			}))
 
 			return { results: formattedResults }
-		} catch (error) {
+		} catch (_error) {
 			throw new Error('Failed to search documents in vector store.')
 		}
 	}
@@ -208,6 +197,7 @@ class DocumentService {
 		const validatedFilename = validation.data.source
 
 		try {
+			// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -- Unclear why this rule triggers on the 'where' clause
 			const deleteResult = await userCollection.delete({
 				where: { source: validatedFilename },
 			})
@@ -217,7 +207,7 @@ class DocumentService {
 				message: `Successfully deleted vector data for source: ${validatedFilename}`,
 				deletedVectorCount: deletedCount,
 			}
-		} catch (error) {
+		} catch (_error) {
 			throw new Error(`Failed to delete vector data for source '${validatedFilename}'.`)
 		}
 	}

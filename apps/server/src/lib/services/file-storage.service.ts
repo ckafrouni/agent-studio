@@ -1,21 +1,23 @@
-import { s3Client, bucketName } from '@/lib/s3/client'
+import type { GetObjectCommandOutput } from '@aws-sdk/client-s3'
 import {
 	GetObjectCommand,
 	DeleteObjectCommand,
 	NoSuchKey,
-	GetObjectCommandOutput,
 	PutObjectCommand,
 } from '@aws-sdk/client-s3'
 import mime from 'mime-types'
 import { Readable as NodeReadable } from 'node:stream'
+import { s3Client, bucketName } from '@/lib/s3/client'
 
 class FileStorageService {
 	private async _streamToBuffer(stream: NodeReadable): Promise<Buffer> {
 		const chunks: Buffer[] = []
 		return new Promise((resolve, reject) => {
-			stream.on('data', (chunk) => chunks.push(chunk))
+			stream.on('data', (chunk: Buffer) => chunks.push(chunk))
 			stream.on('error', reject)
-			stream.on('end', () => resolve(Buffer.concat(chunks)))
+			stream.on('end', () => {
+				resolve(Buffer.concat(chunks))
+			})
 		})
 	}
 
@@ -45,16 +47,19 @@ class FileStorageService {
 				buffer,
 				contentType: s3Response.ContentType,
 			}
-		} catch (error: any) {
-			if (error instanceof NoSuchKey || error.name === 'NoSuchKey') {
+		} catch (error: unknown) {
+			if (error instanceof NoSuchKey) {
 				throw error
 			}
-			throw new Error(`Failed to retrieve file from S3: ${error.message}`)
+			if (error instanceof Error) {
+				throw new Error(`Failed to retrieve file from S3: ${error.message}`)
+			}
+			throw new Error('Failed to retrieve file from S3: Unknown error')
 		}
 	}
 
 	getContentTypeFromS3Response(s3Response: GetObjectCommandOutput, source: string): string {
-		return s3Response.ContentType || mime.lookup(source) || 'application/octet-stream'
+		return s3Response.ContentType ?? (mime.lookup(source) || 'application/octet-stream')
 	}
 
 	async deleteFileFromS3(source: string): Promise<void> {
@@ -77,8 +82,11 @@ class FileStorageService {
 		try {
 			const command = new PutObjectCommand(uploadParams)
 			await s3Client.send(command)
-		} catch (error: any) {
-			throw new Error(`Failed to upload file to S3: ${error.message}`)
+		} catch (error: unknown) {
+			if (error instanceof Error) {
+				throw new Error(`Failed to upload file to S3: ${error.message}`)
+			}
+			throw new Error('Failed to upload file to S3: Unknown error')
 		}
 	}
 }
