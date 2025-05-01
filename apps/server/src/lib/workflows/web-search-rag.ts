@@ -87,10 +87,7 @@ const doc_retriever = async (state: GraphAnnotationType) => {
 					source: String(results.metadatas[0][i]?.source ?? 'Unknown Source'),
 				},
 			}))
-			.filter((doc) => {
-				// Filter out documents with distance > 0.6 (too dissimilar)
-				return doc.metadata.distance <= 0.6
-			})
+			.filter((doc) => doc.metadata.distance <= 0.6)
 	}
 
 	return { documents }
@@ -149,7 +146,6 @@ const web_searcher = async (state: GraphAnnotationType) => {
 		maxResults: 3,
 		tavilyApiKey: env.TAVILY_API_KEY,
 	})
-	// Cast the result explicitly as the linter cannot infer the type from invoke
 	const web_context = (await tool.invoke({ query: question })) as TavilySearchResponse | null
 
 	return !web_context
@@ -162,10 +158,9 @@ const web_generator = async (state: GraphAnnotationType) => {
 	const last_message = state.messages[state.messages.length - 1]
 	const question = last_message.content as string
 
-	// Handle potential null/undefined web_context without non-null assertion
 	const web_context_content = state.web_context
 		? extractContextFromTavilyResponse(state.web_context)
-		: '' // Provide a default empty string or handle appropriately
+		: ''
 
 	const prompt = await PromptTemplate.fromTemplate(
 		`
@@ -191,7 +186,7 @@ const web_generator = async (state: GraphAnnotationType) => {
     
     Answer:
     `,
-	).format({ question, web_context: web_context_content }) // Use the safe variable
+	).format({ question, web_context: web_context_content })
 
 	const response = await model.invoke([...state.messages, new SystemMessage(prompt)])
 

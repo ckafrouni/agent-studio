@@ -8,7 +8,6 @@ const extractFilename = (sourceUriOrFilename: string | undefined): string | unde
 		const uri = new URL(sourceUriOrFilename)
 		return uri.pathname.split('/').pop()
 	} catch (_e) {
-		// If it's not a valid URL, assume it's a filename
 		return sourceUriOrFilename
 	}
 }
