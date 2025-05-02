@@ -8,10 +8,13 @@ import { FileUploadCard } from './components/FileUploadCard'
 import { SearchCard } from './components/SearchCard'
 import { DocumentListCard } from './components/DocumentListCard'
 import { trpc } from '@/utils/trpc'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { authClient } from '@/lib/auth-client'
 import { redirect } from 'next/navigation'
 import { SiteHeader } from '@/components/layout/site-header'
+import { ApiKeysTable, API_KEYS_QUERY_KEY } from './components/api-keys-table'
+import { CreateApiKeyModal } from './components/create-api-key-modal'
+import { Button } from '@/components/ui/button'
 
 interface DocumentInfo {
 	id: string
@@ -22,18 +25,21 @@ interface DocumentInfo {
 
 export default function AdminPage() {
 	const { data: session, isPending } = authClient.useSession()
-	useEffect(() => {
-		if (!isPending && !session) {
-			redirect('/login')
-		}
-	}, [session, isPending])
-
+	const queryClient = useQueryClient()
 	const [documentList, setDocumentList] = useState<DocumentInfo[]>([])
 	const [isLoadingList, setIsLoadingList] = useState(true)
 	const [errorList, setErrorList] = useState<string | null>(null)
 
 	const [deletingDocId, setDeletingDocId] = useState<string | null>(null)
 	const [isDeleting, setIsDeleting] = useState(false)
+
+	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+
+	useEffect(() => {
+		if (!isPending && !session) {
+			redirect('/login')
+		}
+	}, [session, isPending])
 
 	const fetchDocumentList = useCallback(async () => {
 		setIsLoadingList(true)
@@ -88,10 +94,14 @@ export default function AdminPage() {
 
 	const healthCheck = useQuery(trpc.healthCheck.queryOptions())
 
+	const handleKeyCreated = () => {
+		queryClient.invalidateQueries({ queryKey: API_KEYS_QUERY_KEY })
+	}
+
 	return (
 		<div className="flex h-full flex-col">
 			<SiteHeader breadcrumbs={['Projects', 'Default']} />
-			<div className="container mx-auto grid max-w-4xl grid-cols-1 gap-6 pt-24">
+			<div className="container mx-auto grid max-w-4xl grid-cols-1 gap-6 pb-12 pt-24">
 				<section className="rounded-lg border p-4">
 					<h2 className="mb-2 font-medium">API Status</h2>
 					<div className="flex items-center gap-2">
@@ -112,6 +122,14 @@ export default function AdminPage() {
 
 				<SearchCard />
 
+				<section className="space-y-4">
+					<div className="flex items-center justify-between">
+						<h2 className="text-lg font-semibold">API Keys</h2>
+						<Button onClick={() => setIsCreateModalOpen(true)}>Create API Key</Button>
+					</div>
+					<ApiKeysTable />
+				</section>
+
 				<DocumentListCard
 					documents={documentList}
 					isLoading={isLoadingList}
@@ -121,6 +139,12 @@ export default function AdminPage() {
 					docBeingDeletedId={deletingDocId}
 				/>
 			</div>
+
+			<CreateApiKeyModal
+				open={isCreateModalOpen}
+				onOpenChange={setIsCreateModalOpen}
+				onKeyCreated={handleKeyCreated}
+			/>
 		</div>
 	)
 }

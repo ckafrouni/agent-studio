@@ -1,4 +1,4 @@
-import { boolean, pgTable, text, timestamp } from 'drizzle-orm/pg-core'
+import { pgTable, text, timestamp, boolean, integer } from 'drizzle-orm/pg-core'
 
 export const user = pgTable('user', {
 	id: text('id').primaryKey(),
@@ -48,4 +48,30 @@ export const verification = pgTable('verification', {
 	expiresAt: timestamp('expires_at').notNull(),
 	createdAt: timestamp('created_at'),
 	updatedAt: timestamp('updated_at'),
+})
+
+export const apikey = pgTable('apikey', {
+	id: text('id').primaryKey(),
+	name: text('name'),
+	start: text('start'),
+	prefix: text('prefix'),
+	key: text('key').notNull(),
+	userId: text('user_id')
+		.notNull()
+		.references(() => user.id, { onDelete: 'cascade' }),
+	refillInterval: integer('refill_interval'),
+	refillAmount: integer('refill_amount'),
+	lastRefillAt: timestamp('last_refill_at'),
+	enabled: boolean('enabled'),
+	rateLimitEnabled: boolean('rate_limit_enabled'),
+	rateLimitTimeWindow: integer('rate_limit_time_window'),
+	rateLimitMax: integer('rate_limit_max'),
+	requestCount: integer('request_count'),
+	remaining: integer('remaining'),
+	lastRequest: timestamp('last_request'),
+	expiresAt: timestamp('expires_at'),
+	createdAt: timestamp('created_at').notNull(),
+	updatedAt: timestamp('updated_at').notNull(),
+	permissions: text('permissions'),
+	metadata: text('metadata'),
 })
