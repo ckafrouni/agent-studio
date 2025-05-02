@@ -2,7 +2,7 @@
 build
 coverage
 node_modules
-*lock
+*lock*
 .env.*
 venv
 .venv
