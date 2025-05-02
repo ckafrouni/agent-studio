@@ -83,7 +83,7 @@ function PricingCard({
 	return (
 		<div className="bg-background relative flex flex-col rounded-lg border p-6 shadow-sm">
 			{popular && (
-				<div className="bg-primary text-primary-foreground absolute -top-4 right-0 left-0 mx-auto w-fit rounded-full px-3 py-1 text-xs font-medium">
+				<div className="bg-primary text-primary-foreground absolute -top-4 left-0 right-0 mx-auto w-fit rounded-full px-3 py-1 text-xs font-medium">
 					Popular
 				</div>
 			)}

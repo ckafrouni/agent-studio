@@ -34,7 +34,7 @@ export function HeroSection() {
 								<Code className="text-muted-foreground/30 h-24 w-24" />
 							</div>
 							<div className="from-background absolute inset-0 bg-gradient-to-t via-transparent to-transparent"></div>
-							<div className="bg-background/90 absolute right-4 bottom-4 left-4 rounded-lg p-4 backdrop-blur">
+							<div className="bg-background/90 absolute bottom-4 left-4 right-4 rounded-lg p-4 backdrop-blur">
 								<div className="text-sm font-medium">LangGraph Workflow</div>
 								<div className="text-muted-foreground mt-2 text-xs">
 									<code>{`import { createGraph } from "@langchain/langgraph-sdk"`}</code>

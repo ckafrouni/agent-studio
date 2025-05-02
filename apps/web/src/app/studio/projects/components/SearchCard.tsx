@@ -114,7 +114,7 @@ export function SearchCard() {
 						<h4 className="text-lg font-semibold">Search Results:</h4>
 						{searchResults.map((result) => (
 							<Card key={result.id} className="bg-muted/50">
-								<CardHeader className="pt-4 pb-2">
+								<CardHeader className="pb-2 pt-4">
 									<CardDescription>
 										Source: <strong>{result.metadata?.source ?? 'Unknown'}</strong> (Score:{' '}
 										{result.metadata?.distance?.toFixed(4) ?? 'N/A'})

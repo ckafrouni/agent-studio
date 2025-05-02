@@ -390,7 +390,7 @@ export function DataTable({ data: initialData }: { data: z.infer<typeof schema>[
 					View
 				</Label>
 				<Select defaultValue="outline">
-					<SelectTrigger className="flex w-fit @4xl/main:hidden" size="sm" id="view-selector">
+					<SelectTrigger className="@4xl/main:hidden flex w-fit" size="sm" id="view-selector">
 						<SelectValue placeholder="Select a view" />
 					</SelectTrigger>
 					<SelectContent>
@@ -400,7 +400,7 @@ export function DataTable({ data: initialData }: { data: z.infer<typeof schema>[
 						<SelectItem value="focus-documents">Focus Documents</SelectItem>
 					</SelectContent>
 				</Select>
-				<TabsList className="**:data-[slot=badge]:bg-muted-foreground/30 hidden **:data-[slot=badge]:size-5 **:data-[slot=badge]:rounded-full **:data-[slot=badge]:px-1 @4xl/main:flex">
+				<TabsList className="**:data-[slot=badge]:bg-muted-foreground/30 **:data-[slot=badge]:size-5 **:data-[slot=badge]:rounded-full **:data-[slot=badge]:px-1 @4xl/main:flex hidden">
 					<TabsTrigger value="outline">Outline</TabsTrigger>
 					<TabsTrigger value="past-performance">
 						Past Performance <Badge variant="secondary">3</Badge>
@@ -655,7 +655,7 @@ function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
 							</ChartContainer>
 							<Separator />
 							<div className="grid gap-2">
-								<div className="flex gap-2 leading-none font-medium">
+								<div className="flex gap-2 font-medium leading-none">
 									Trending up by 5.2% this month <IconTrendingUp className="size-4" />
 								</div>
 								<div className="text-muted-foreground">
