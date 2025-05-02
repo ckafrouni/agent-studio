@@ -4,50 +4,49 @@ import { Button } from '@/components/ui/button'
 
 export function Header() {
 	return (
-		<header className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
+		<header className="sticky top-0 z-50 w-full border-b border-white/10 bg-black/80 backdrop-blur-lg supports-[backdrop-filter]:bg-black/50">
 			<div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
 				<div className="flex gap-6 md:gap-10">
 					<Link href="/" className="flex items-center space-x-2">
-						<Server className="h-6 w-6" />
-						<span className="inline-block font-extrabold">Agent Studio</span>
+						<div className="rounded-sm bg-white p-1">
+							<Server className="h-5 w-5 text-black" />
+						</div>
+						<span className="inline-block font-bold">Agent Studio</span>
 					</Link>
 					<nav className="hidden gap-6 md:flex">
 						<Link
 							href="#features"
-							className="text-muted-foreground hover:text-foreground flex items-center text-sm font-medium transition-colors"
+							className="flex items-center text-sm font-medium text-white/70 transition-colors hover:text-white"
 						>
 							Features
 						</Link>
 						<Link
 							href="#how-it-works"
-							className="text-muted-foreground hover:text-foreground flex items-center text-sm font-medium transition-colors"
+							className="flex items-center text-sm font-medium text-white/70 transition-colors hover:text-white"
 						>
 							How It Works
 						</Link>
 						<Link
 							href="#pricing"
-							className="text-muted-foreground hover:text-foreground flex items-center text-sm font-medium transition-colors"
+							className="flex items-center text-sm font-medium text-white/70 transition-colors hover:text-white"
 						>
 							Pricing
 						</Link>
 						<Link
 							href="#faq"
-							className="text-muted-foreground hover:text-foreground flex items-center text-sm font-medium transition-colors"
+							className="flex items-center text-sm font-medium text-white/70 transition-colors hover:text-white"
 						>
 							FAQ
 						</Link>
 					</nav>
 				</div>
 				<div className="flex flex-1 items-center justify-end space-x-4">
-					<nav className="flex items-center space-x-4">
-						<Link
-							href="/login"
-							className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
-						>
-							Login
-						</Link>
-						<Button asChild>
-							<Link href="/login">Get Started</Link>
+					<nav className="flex items-center space-x-2">
+						<Button asChild variant="outline" className="bg-white text-black hover:bg-white/90">
+							<Link href="/login">Login</Link>
+						</Button>
+						<Button asChild variant="default" className="bg-white text-black hover:bg-white/90">
+							<Link href="/signup">Get Started</Link>
 						</Button>
 					</nav>
 				</div>

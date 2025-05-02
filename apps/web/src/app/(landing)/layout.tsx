@@ -1,4 +1,5 @@
 import { AlphaBanner } from './components/alpha-banner'
+import { Footer } from './components/footer'
 import { Header } from './components/header'
 
 export default function RootLayout({
@@ -7,10 +8,11 @@ export default function RootLayout({
 	children: React.ReactNode
 }>) {
 	return (
-		<>
+		<div className="flex min-h-screen flex-col bg-black text-white">
 			<AlphaBanner />
 			<Header />
-			<main className="">{children}</main>
-		</>
+			<main className="flex-1">{children}</main>
+			<Footer />
+		</div>
 	)
 }

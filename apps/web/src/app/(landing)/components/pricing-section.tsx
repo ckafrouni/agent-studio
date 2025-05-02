@@ -1,21 +1,20 @@
 import { Button } from '@/components/ui/button'
 import { Check } from 'lucide-react'
-import Link from 'next/link'
 
 export function PricingSection() {
 	return (
-		<section id="pricing" className="bg-muted w-full py-12 md:py-24 lg:py-32">
+		<section id="pricing" className="bg-grid-pattern bg-grid-sm w-full py-12 md:py-24 lg:py-32">
 			<div className="container px-4 md:px-6">
 				<div className="flex flex-col items-center justify-center space-y-4 text-center">
 					<div className="space-y-2">
-						<div className="bg-primary text-primary-foreground inline-block rounded-lg px-3 py-1 text-sm">
+						<div className="inline-block rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white/70">
 							Pricing
 						</div>
 						<h2 className="text-3xl font-bold tracking-tighter md:text-4xl">
-							Simple, Transparent Pricing
+							Simple, <span className="vercel-gradient">Transparent Pricing</span>
 						</h2>
-						<p className="text-muted-foreground max-w-[700px] md:text-xl">
-							Choose the plan that&apos;s right for your development needs.
+						<p className="max-w-[700px] text-white/70 md:text-xl">
+							Choose the plan that's right for your development needs.
 						</p>
 					</div>
 				</div>
@@ -81,30 +80,41 @@ function PricingCard({
 	popular,
 }: PricingCardProps) {
 	return (
-		<div className="bg-background relative flex flex-col rounded-lg border p-6 shadow-sm">
+		<div
+			className={`relative flex flex-col rounded-lg border ${
+				popular ? 'border-white/20 shadow-[0_0_15px_rgba(255,255,255,0.1)]' : 'border-white/10'
+			} bg-black/30 p-6 backdrop-blur-sm transition-all hover:border-white/20`}
+		>
 			{popular && (
-				<div className="bg-primary text-primary-foreground absolute -top-4 left-0 right-0 mx-auto w-fit rounded-full px-3 py-1 text-xs font-medium">
+				<div className="absolute -top-4 left-0 right-0 mx-auto w-fit rounded-full bg-white px-3 py-1 text-xs font-medium text-black">
 					Popular
 				</div>
 			)}
 			<div className="space-y-2">
 				<h3 className="text-2xl font-bold">{title}</h3>
-				<p className="text-muted-foreground">{description}</p>
+				<p className="text-white/70">{description}</p>
 			</div>
 			<div className="mt-4 flex items-baseline text-3xl font-bold">
 				{price}
-				<span className="text-muted-foreground ml-1 text-base font-medium">/month</span>
+				<span className="ml-1 text-base font-medium text-white/70">/month</span>
 			</div>
 			<ul className="mt-6 space-y-3">
 				{features.map((feature, index) => (
 					<li key={index} className="flex items-center">
-						<Check className="text-primary mr-2 h-4 w-4" />
-						<span>{feature}</span>
+						<Check className="mr-2 h-4 w-4 text-[#7928ca]" />
+						<span className="text-white/90">{feature}</span>
 					</li>
 				))}
 			</ul>
-			<Button className="mt-6" variant={buttonVariant} asChild>
-				<Link href="#">{buttonText}</Link>
+			<Button
+				className={`mt-6 ${
+					buttonVariant === 'default'
+						? 'bg-white text-black hover:bg-white/90'
+						: 'border-white/20 bg-transparent hover:bg-white/10'
+				}`}
+				variant={buttonVariant}
+			>
+				{buttonText}
 			</Button>
 		</div>
 	)
