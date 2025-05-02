@@ -11,16 +11,10 @@
 		"lint": "turbo lint",
 		"check-types": "turbo check-types",
 		"format": "prettier . --write",
-		"prepare": "husky",
 		"clean": "find . -type d \\( -name \".next\" -o -name \".turbo\" -o -name \"node_modules\" -o -name \"dist\" \\) -exec rm -rf {} \\; 2>/dev/null || find . -name \"tsconfig.tsbuildinfo\" -type f -delete"
-	},
-	"lint-staged": {
-		"**/*": "prettier --write --ignore-unknown"
 	},
 	"dependencies": {},
 	"devDependencies": {
-		"husky": "^9.1.7",
-		"lint-staged": "^15.5.1",
 		"prettier": "3.5.3",
 		"prettier-plugin-tailwindcss": "^0.6.11",
 		"turbo": "^2.5.2"
