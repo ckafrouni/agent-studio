@@ -1,16 +1,16 @@
 export function FAQSection() {
 	return (
-		<section id="faq" className="w-full bg-black py-12 md:py-24 lg:py-32">
+		<section id="faq" className="w-full bg-white py-12 md:py-24 lg:py-32 dark:bg-black">
 			<div className="container px-4 md:px-6">
 				<div className="flex flex-col items-center justify-center space-y-4 text-center">
 					<div className="space-y-2">
-						<div className="inline-block rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white/70">
+						<div className="inline-block rounded-full bg-black/10 px-3 py-1 text-xs font-medium text-black/70 dark:bg-white/10 dark:text-white/70">
 							FAQ
 						</div>
 						<h2 className="text-3xl font-bold tracking-tighter md:text-4xl">
 							Frequently <span className="vercel-gradient">Asked Questions</span>
 						</h2>
-						<p className="max-w-[700px] text-white/70 md:text-xl">
+						<p className="text-muted-foreground max-w-[700px] md:text-xl">
 							Answers to common questions about Agent Studio.
 						</p>
 					</div>
@@ -53,9 +53,9 @@ interface FAQCardProps {
 
 function FAQCard({ question, answer }: FAQCardProps) {
 	return (
-		<div className="group rounded-lg border border-white/10 bg-black/30 p-6 backdrop-blur-sm transition-all hover:border-white/20 hover:bg-black/40">
+		<div className="group rounded-lg border border-black/10 bg-white/50 p-6 backdrop-blur-sm transition-all hover:border-black/20 hover:bg-white/80 dark:border-white/10 dark:bg-black/30 dark:hover:border-white/20 dark:hover:bg-black/40">
 			<h3 className="text-xl font-bold">{question}</h3>
-			<p className="mt-2 text-white/70">{answer}</p>
+			<p className="text-muted-foreground mt-2">{answer}</p>
 		</div>
 	)
 }

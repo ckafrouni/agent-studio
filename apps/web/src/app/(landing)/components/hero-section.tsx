@@ -4,29 +4,36 @@ import { Button } from '@/components/ui/button'
 
 export function HeroSection() {
 	return (
-		<section className="bg-dots-pattern bg-dots-sm w-full bg-black py-12 md:py-24 lg:py-32 xl:py-48">
+		<section className="bg-dots-pattern w-full bg-white py-12 md:py-24 lg:py-32 xl:py-48 dark:bg-black">
 			<div className="container px-4 md:px-6">
 				<div className="grid gap-6 lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">
 					<div className="flex flex-col justify-center space-y-4">
 						<div className="space-y-2">
-							<div className="inline-block rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white/70">
+							<div className="inline-block rounded-full bg-black/10 px-3 py-1 text-xs font-medium text-black/70 dark:bg-white/10 dark:text-white/70">
 								Next-Gen Agent Platform
 							</div>
 							<h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
 								Build, Host & Test Your <span className="vercel-gradient">LangGraph Workflows</span>
 							</h1>
-							<p className="max-w-[600px] text-white/70 md:text-xl">
+							<p className="text-muted-foreground max-w-[600px] md:text-xl">
 								Agent Studio is the complete platform for LangGraph agent developers to upload, run,
 								and test their graph workflows with ease.
 							</p>
 						</div>
 						<div className="flex flex-col gap-2 min-[400px]:flex-row">
-							<Button size="lg" className="bg-white text-black hover:bg-white/90">
+							<Button
+								size="lg"
+								className="bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
+							>
 								<Link href="/signup" className="flex items-center">
 									Get Started <ArrowRight className="ml-2 h-4 w-4" />
 								</Link>
 							</Button>
-							<Button variant="outline" size="lg" className="border-white/20 hover:bg-white/10">
+							<Button
+								variant="outline"
+								size="lg"
+								className="border-black/20 hover:bg-black/5 dark:border-white/20 dark:hover:bg-white/10"
+							>
 								<Link href="/docs">View Documentation</Link>
 							</Button>
 						</div>

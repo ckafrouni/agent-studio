@@ -3,17 +3,20 @@ import { Check } from 'lucide-react'
 
 export function PricingSection() {
 	return (
-		<section id="pricing" className="bg-grid-pattern bg-grid-sm w-full py-12 md:py-24 lg:py-32">
+		<section
+			id="pricing"
+			className="bg-grid-pattern w-full bg-white py-12 md:py-24 lg:py-32 dark:bg-black"
+		>
 			<div className="container px-4 md:px-6">
 				<div className="flex flex-col items-center justify-center space-y-4 text-center">
 					<div className="space-y-2">
-						<div className="inline-block rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white/70">
+						<div className="inline-block rounded-full bg-black/10 px-3 py-1 text-xs font-medium text-black/70 dark:bg-white/10 dark:text-white/70">
 							Pricing
 						</div>
 						<h2 className="text-3xl font-bold tracking-tighter md:text-4xl">
 							Simple, <span className="vercel-gradient">Transparent Pricing</span>
 						</h2>
-						<p className="max-w-[700px] text-white/70 md:text-xl">
+						<p className="text-muted-foreground max-w-[700px] md:text-xl">
 							Choose the plan that's right for your development needs.
 						</p>
 					</div>
@@ -82,35 +85,37 @@ function PricingCard({
 	return (
 		<div
 			className={`relative flex flex-col rounded-lg border ${
-				popular ? 'border-white/20 shadow-[0_0_15px_rgba(255,255,255,0.1)]' : 'border-white/10'
-			} bg-black/30 p-6 backdrop-blur-sm transition-all hover:border-white/20`}
+				popular
+					? 'border-black/20 shadow-[0_0_15px_rgba(0,0,0,0.1)] dark:border-white/20 dark:shadow-[0_0_15px_rgba(255,255,255,0.1)]'
+					: 'border-black/10 dark:border-white/10'
+			} bg-white/50 p-6 backdrop-blur-sm transition-all hover:border-black/20 dark:bg-black/30 dark:hover:border-white/20`}
 		>
 			{popular && (
-				<div className="absolute -top-4 left-0 right-0 mx-auto w-fit rounded-full bg-white px-3 py-1 text-xs font-medium text-black">
+				<div className="absolute -top-4 left-0 right-0 mx-auto w-fit rounded-full bg-black px-3 py-1 text-xs font-medium text-white dark:bg-white dark:text-black">
 					Popular
 				</div>
 			)}
 			<div className="space-y-2">
 				<h3 className="text-2xl font-bold">{title}</h3>
-				<p className="text-white/70">{description}</p>
+				<p className="text-muted-foreground">{description}</p>
 			</div>
 			<div className="mt-4 flex items-baseline text-3xl font-bold">
 				{price}
-				<span className="ml-1 text-base font-medium text-white/70">/month</span>
+				<span className="text-muted-foreground ml-1 text-base font-medium">/month</span>
 			</div>
 			<ul className="mt-6 space-y-3">
 				{features.map((feature, index) => (
 					<li key={index} className="flex items-center">
-						<Check className="mr-2 h-4 w-4 text-[#7928ca]" />
-						<span className="text-white/90">{feature}</span>
+						<Check className="mr-2 h-4 w-4 text-[oklch(0.546_0.245_262.881)]" />
+						<span className="text-foreground/90">{feature}</span>
 					</li>
 				))}
 			</ul>
 			<Button
 				className={`mt-6 ${
 					buttonVariant === 'default'
-						? 'bg-white text-black hover:bg-white/90'
-						: 'border-white/20 bg-transparent hover:bg-white/10'
+						? 'bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90'
+						: 'border-black/20 bg-transparent hover:bg-black/5 dark:border-white/20 dark:hover:bg-white/10'
 				}`}
 				variant={buttonVariant}
 			>

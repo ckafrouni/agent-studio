@@ -6,7 +6,6 @@ import { HowItWorksSection } from './components/how-it-works-section'
 import { PricingSection } from './components/pricing-section'
 import { FAQSection } from './components/faq-section'
 import { CTASection } from './components/cta-section'
-import { Footer } from './components/footer'
 
 export default function LandingPage() {
 	return (
