@@ -10,7 +10,7 @@ export const MarkdownRenderer = ({
 	className?: string
 }) => {
 	return (
-		<div className={cn('prose dark:prose-invert text-foreground max-w-none', className)}>
+		<div className={cn('prose dark:prose-invert max-w-none', className)}>
 			<ReactMarkdown
 				remarkPlugins={[remarkGfm]}
 				components={{
