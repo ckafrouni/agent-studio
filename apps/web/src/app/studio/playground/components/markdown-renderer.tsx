@@ -22,7 +22,7 @@ export const MarkdownRenderer = ({
 							className={cn(
 								props.className,
 								'px-0.5 text-purple-400 hover:text-purple-600',
-								'rounded border bg-blue-400 px-2 py-1 text-white no-underline hover:bg-blue-500 hover:text-white',
+								'rounded border bg-blue-400/50 px-1.5 py-0.5 text-white no-underline hover:bg-blue-400 hover:text-white',
 							)}
 						/>
 					),
