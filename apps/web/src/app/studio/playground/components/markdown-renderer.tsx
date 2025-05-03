@@ -19,7 +19,11 @@ export const MarkdownRenderer = ({
 							{...props}
 							target="_blank"
 							rel="noopener noreferrer"
-							className={cn('px-0.5 text-purple-400 hover:text-purple-600')}
+							className={cn(
+								props.className,
+								'px-0.5 text-purple-400 hover:text-purple-600',
+								'rounded border bg-blue-400 px-2 py-1 text-white no-underline hover:bg-blue-500 hover:text-white',
+							)}
 						/>
 					),
 					h1: ({ ...props }) => <h1 {...props} className={cn('mb-4')} />,

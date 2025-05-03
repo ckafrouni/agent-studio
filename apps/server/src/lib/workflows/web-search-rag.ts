@@ -118,7 +118,7 @@ const generator = async (state: GraphAnnotationType) => {
     - A table if you need to present tabular data.
     
     When referencing information from a specific source document listed in the context above (e.g., '[Source: example.pdf | ID: some_id]'), you MUST include a citation at the end of the relevant sentence. 
-    Format the citation as a relative markdown link: '[[Index](/api/files/content/FILENAME)]'. Replace FILENAME with the actual filename you extracted from the '[Source: FILENAME | ID: ...]' part of the context for that document. 
+    Format the citation as a relative markdown link: '[Index](/api/files/content/FILENAME)'. Replace FILENAME with the actual filename you extracted from the '[Source: FILENAME | ID: ...]' part of the context for that document. 
     **Important:** Replace the '[Index]' part of the link text with the actual index number (e.g., '[1]', '[2]') corresponding to the '[Index: N | ...]' line in the context you are citing.
     Ensure the FILENAME in the link is properly URL-encoded if it contains spaces or special characters.
     Do not include details that are not supported by the context.
@@ -175,7 +175,7 @@ const web_generator = async (state: GraphAnnotationType) => {
     - A table if you need to present tabular data.
     
     When referencing information from a specific source document listed in the context above (e.g., '[Source: example.pdf | ID: some_id]'), you MUST include a citation at the end of the relevant sentence. 
-    Format the citation as a relative markdown link: '[[Index](URL)]'. Replace URL with the actual URL you extracted from the '[Source: URL | ID: ...]' part of the context for that document. 
+    Format the citation as a relative markdown link: '[Index](URL)'. Replace URL with the actual URL you extracted from the '[Source: URL | ID: ...]' part of the context for that document. 
     **Important:** Replace the '[Index]' part of the link text with the actual index number (e.g., '[1]', '[2]') corresponding to the '[Index: N | ...]' line in the context you are citing.
     Do not include details that are not supported by the context.
     
