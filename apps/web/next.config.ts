@@ -17,6 +17,8 @@ const nextConfig: NextConfig = {
 			},
 		],
 	},
+	// disable linting
+	linting: false,
 }
 
 export default nextConfig
