@@ -17,8 +17,9 @@ const nextConfig: NextConfig = {
 			},
 		],
 	},
-	// disable linting
-	linting: false,
+	eslint: {
+		ignoreDuringBuilds: true,
+	},
 }
 
 export default nextConfig
