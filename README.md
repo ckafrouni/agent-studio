@@ -99,14 +99,13 @@ Here are some useful scripts available from the root directory:
 
 ### Current measures
 
-- **Authentication & Authorization:** Utilizes `better-auth` for handling email/password, Google OAuth, and API key authentication. Passwords are securely hashed and salted (e.g., using bcrypt). Session-based authorization is enforced via tRPC protected procedures and Hono middleware, ensuring only authenticated users can access protected resources.
+- **Authentication & Authorization:** Utilizes `better-auth` for handling email/password, Google OAuth, and API key authentication. Session-based authorization is enforced via tRPC protected procedures and Hono middleware, ensuring only authenticated users can access protected resources.
 - **Session Security:** Employs HttpOnly, Secure cookies for session management, typically using short-lived access tokens and longer-lived refresh tokens to minimize exposure.
 - **Input Validation:** Employs `zod` schemas for validating inputs in backend services (e.g., document search, deletion parameters). Basic validation is performed on file uploads (size, name, type). Environment variables are validated at runtime using `@t3-oss/env-*`.
 - **Secrets Management:** Relies on environment variables (`.env`) for sensitive data like API keys and database credentials, preventing hardcoding in source code. T3 Env ensures required variables are present and correctly formatted.
 - **API Security:** Leverages tRPC for type-safe communication between frontend and backend. CORS policies are configured using `hono/cors` to restrict cross-origin requests.
-- **HTTPS Enforcement:** All communication should be over HTTPS to prevent eavesdropping and tampering (configuration may depend on deployment environment).
 - **Database Security:** Uses Drizzle ORM, which helps mitigate SQL injection risks through parameterized queries.
-- **Dependency Management:** Uses `pnpm` with a lockfile (`pnpm-lock.yaml`) for deterministic dependency installation. Dependency updates and vulnerability scanning may be managed via tools like Dependabot/Renovate.
+- **Dependency Management:** Uses `pnpm` with a lockfile (`pnpm-lock.yaml`) for deterministic dependency installation. Dependency updates and vulnerability are managed via Dependabot.
 - **Enumeration Prevention:** Uses non-sequential IDs (e.g., UUIDs) for key resources where applicable, making it harder for attackers to guess identifiers.
 
 ### Future plans
@@ -116,24 +115,22 @@ Here are some useful scripts available from the root directory:
 - Conduct regular dependency vulnerability scanning and updates (formalize process if not already done).
 - Implement more comprehensive file validation beyond basic checks (e.g., magic number checks, stricter size limits, potentially virus scanning).
 - Add security headers (e.g., CSP, HSTS, Permissions-Policy) via Hono middleware.
-- Implement checks against known breached password lists during signup/password change.
-- Introduce multi-factor authentication (e.g., TOTP or email-based codes).
+- Implement checks against known breached password lists during signup/password change. (via `better-auth`'s haveibeenpwned integration)
+- Introduce multi-factor authentication (TOTP via `better-auth`).
 - Implement user-facing session management (view active sessions, revoke specific sessions).
 - Send email notifications for security-sensitive events (e.g., logins from new devices, password changes).
-- Implement anti-CSRF tokens/mechanisms for relevant web routes if forms or state-changing GET requests are used without API-style authorization headers.
-- Utilize a Content Delivery Network (CDN) for DDoS mitigation and improved performance.
 
 ## Threat Model
 
 - **Injection Attacks:**
-  - _Prompt Injection (Medium-High):_ Direct interaction with LLMs via LangChain/LangGraph makes this a significant risk. Requires robust input sanitization and output encoding specific to LLM interactions.
-  - _Cross-Site Scripting (XSS) (Medium):_ While React/Next.js offer protection, improper handling of user-generated content (e.g., in chat display or markdown rendering) could introduce vulnerabilities.
+  - _Prompt Injection (Medium-High):_ Direct interaction with LLMs via LangChain/LangGraph makes this a significant risk. Requires robust input sanitization (only an issue for LLM prompts if we want to block certain inputs).
+  - _Cross-Site Scripting (XSS) (Low):_ React/Next.js offer protection, and the generated markdown is rendered via a react library that sanitizes the markdown.
   - _SQL Injection (Low):_ Mitigated by the use of Drizzle ORM, assuming standard usage patterns.
 - **Authentication/Authorization Issues (Medium):** Potential risks include weak user passwords, compromised OAuth/API keys, session hijacking/fixation, or flaws in the `better-auth` configuration/implementation allowing unauthorized access.
 - **Insecure File Handling (Medium):** Uploading and processing various file types (PDF, DOCX, TXT) introduces risks. Malicious files could target parsers (`pdf-parse`, `mammoth`), cause DoS, or potentially contain malware. Requires robust validation of file types, sizes, and potentially content scanning.
-- **Data Exposure (Medium):** Misconfiguration of S3 permissions, database access, insufficiently protected API endpoints, or insecure logging could lead to data leaks. Depends on careful implementation of authorization checks and data handling.
-- **Denial of Service (DoS) (Medium):** Resource-intensive tasks like file processing, embedding generation, or complex LangGraph agent runs could be exploited without proper controls like rate limiting, resource constraints, or CDN protection.
-- **Dependency Vulnerabilities (Medium):** Use of third-party libraries introduces the risk of inheriting their vulnerabilities. Requires ongoing monitoring and updates.
+- **Data Exposure (High):** Misconfiguration of S3 permissions, database access, insufficiently protected API endpoints, or insecure logging could lead to data leaks. Depends on careful implementation of authorization checks and data handling.
+- **Denial of Service (DoS) (Medium):** Resource-intensive tasks like file processing, embedding generation, or complex LangGraph agent runs could be exploited without proper controls like rate limiting, resource constraints, or CDN protection. (We could fix this by preventing graphs of certain size, and/or stoping the graph execution if it takes too long)
+- **Dependency Vulnerabilities (Medium):** Use of third-party libraries introduces the risk of inheriting their vulnerabilities. Requires ongoing monitoring and updates. (We currently have quite a long list of dependencies, wich increases the risk of vulnerabilities)
 - **Misconfiguration (Low-Medium):** Incorrect CORS settings, insecure default environment variables, overly permissive security headers, or improper security library setup could weaken the posture.
 - **Cross-Site Request Forgery (CSRF) (Low-Medium):** Potential risk if state-changing actions rely solely on session cookies without specific anti-CSRF mitigation like tokens or SameSite cookie attributes.
 - **Information Disclosure (Low-Medium):** Potential risks from timing attacks on certain endpoints, verbose error messages in production, or analysis of client-side JavaScript bundles revealing internal logic or dependencies.
