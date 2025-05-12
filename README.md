@@ -99,8 +99,7 @@ Here are some useful scripts available from the root directory:
 
 ### Current measures
 
-- **Authentication & Authorization:** Utilizes `better-auth` for handling email/password, Google OAuth, and API key authentication. Session-based authorization is enforced via tRPC protected procedures and Hono middleware, ensuring only authenticated users can access protected resources.
-- **Session Security:** Employs HttpOnly, Secure cookies for session management, typically using short-lived access tokens and longer-lived refresh tokens to minimize exposure.
+- **Authentication & Authorization:** Utilizes `better-auth` for handling email/password, Google OAuth. Session-based authorization is enforced via tRPC protected procedures and Hono middleware, ensuring only authenticated users can access protected resources.
 - **Input Validation:** Employs `zod` schemas for validating inputs in backend services (e.g., document search, deletion parameters). Basic validation is performed on file uploads (size, name, type). Environment variables are validated at runtime using `@t3-oss/env-*`.
 - **Secrets Management:** Relies on environment variables (`.env`) for sensitive data like API keys and database credentials, preventing hardcoding in source code. T3 Env ensures required variables are present and correctly formatted.
 - **API Security:** Leverages tRPC for type-safe communication between frontend and backend. CORS policies are configured using `hono/cors` to restrict cross-origin requests.
@@ -110,8 +109,10 @@ Here are some useful scripts available from the root directory:
 
 ### Future plans
 
+- Implement API key authentication for inference (currently only schema is present)
 - Implement rate limiting for API endpoints (especially API key usage and resource-intensive operations).
 - Enhance input sanitization specifically for LLM prompts to mitigate prompt injection risks.
+- **Session Security:** Employs HttpOnly, Secure cookies for session management, typically using short-lived access tokens and longer-lived refresh tokens to minimize exposure.
 - Conduct regular dependency vulnerability scanning and updates (formalize process if not already done).
 - Implement more comprehensive file validation beyond basic checks (e.g., magic number checks, stricter size limits, potentially virus scanning).
 - Add security headers (e.g., CSP, HSTS, Permissions-Policy) via Hono middleware.
