@@ -61,8 +61,8 @@ const data = {
 			icon: IconChartBar,
 		},
 		{
-			title: 'Projects',
-			url: '/studio/projects',
+			title: 'Workspaces',
+			url: '/studio/workspaces',
 			icon: IconFolder,
 		},
 		{

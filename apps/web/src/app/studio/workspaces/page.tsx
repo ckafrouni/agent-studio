@@ -100,7 +100,7 @@ export default function AdminPage() {
 
 	return (
 		<div className="flex h-full flex-col">
-			<SiteHeader breadcrumbs={['Projects', 'Default']} />
+			<SiteHeader breadcrumbs={['Workspaces', 'Default']} />
 			<div className="container mx-auto grid max-w-4xl grid-cols-1 gap-6 pb-12 pt-24">
 				<section className="rounded-lg border p-4">
 					<h2 className="mb-2 font-medium">API Status</h2>
