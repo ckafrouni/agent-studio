@@ -1,3 +1,5 @@
+NEW VERSION OF THE REPO : https://github.com/ckafrouni/graph-serve
+
 # Agent Studio
 
 A full-stack application designed for building, managing, and interacting with LangGraph AI agents. Built using a modern tech stack within a Turborepo monorepo.
